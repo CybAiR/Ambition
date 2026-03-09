@@ -1,0 +1,485 @@
+<?xml version="1.0" ?>
+<!-- Generated using onshape-to-robot -->
+<!-- Onshape document_id: b90d345b7f72f6696c92ef6f -->
+<robot name="ambition">
+
+  <!-- Dummy root link -->
+  <link name="base_link"/>
+
+  <!-- Fixed joint from dummy root to actual robot root -->
+  <joint name="base_to_buda" type="fixed">
+    <parent link="base_link"/>
+    <child link="buda"/> <!-- your original root -->
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Link buda -->
+  <link name="buda">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="1e-09"/>
+      <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
+    </inertial>
+    <!-- Part buda -->
+    <visual>
+      <origin xyz="0.0054321 0.480832 0.111962" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/buda.stl"/>
+      </geometry>
+      <material name="buda_material">
+        <color rgba="0.615686 0.811765 0.929412 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.0054321 0.480832 0.111962" rpy="0 -0 0"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/buda.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Link pivot -->
+  <link name="pivot">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="1e-09"/>
+      <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
+    </inertial>
+    <!-- Part pivot -->
+    <visual>
+      <origin xyz="-8.67362e-19 0 -0.005" rpy="-3.14159 -1.50463e-36 2.88825e-18"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/pivot.stl"/>
+      </geometry>
+      <material name="pivot_material">
+        <color rgba="0.615686 0.811765 0.929412 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-8.67362e-19 0 -0.005" rpy="-3.14159 -1.50463e-36 2.88825e-18"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/pivot.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Joint from buda to pivot -->
+  <joint name="1" type="revolute">
+    <origin xyz="0.0054321 0.030832 0.266962" rpy="-3.14159 1.07816e-20 3.12067"/>
+    <parent link="buda"/>
+    <child link="pivot"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+  </joint>
+  <!-- Link ramie -->
+  <link name="ramie">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="1e-09"/>
+      <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
+    </inertial>
+    <!-- Part ramie -->
+    <visual>
+      <origin xyz="-1.38778e-17 0 -0.005" rpy="1.5708 -5.56307e-32 1.71652e-19"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/ramie.stl"/>
+      </geometry>
+      <material name="ramie_material">
+        <color rgba="0.615686 0.811765 0.929412 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-1.38778e-17 0 -0.005" rpy="1.5708 -5.56307e-32 1.71652e-19"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/ramie.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Link rod -->
+  <link name="rod">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="1e-09"/>
+      <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
+    </inertial>
+    <!-- Part rod -->
+    <visual>
+      <origin xyz="0.0025 0 -0.0745" rpy="1.5708 1.5708 0"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/rod.stl"/>
+      </geometry>
+      <material name="rod_material">
+        <color rgba="0.615686 0.811765 0.929412 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.0025 0 -0.0745" rpy="1.5708 1.5708 0"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/rod.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Link pivot_2 -->
+  <link name="pivot_2">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="1e-09"/>
+      <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
+    </inertial>
+    <!-- Part pivot_2 -->
+    <visual>
+      <origin xyz="0.217937 0.00468479 -0.00238129" rpy="-2.41143 -0.0109236 -3.1201"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/pivot.stl"/>
+      </geometry>
+      <material name="pivot_2_material">
+        <color rgba="0.615686 0.811765 0.929412 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.217937 0.00468479 -0.00238129" rpy="-2.41143 -0.0109236 -3.1201"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/pivot.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Joint from rod to pivot_2 -->
+  <!-- Yaw joint -->
+  <joint name="3_yaw" type="revolute">
+    <parent link="rod"/>
+    <child link="pivot_2_yaw"/>
+    <origin xyz="8.32667e-17 0 -0.149" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-3.14159" upper="3.14159"/>
+  </joint>
+
+  <!-- Pitch joint -->
+  <joint name="3_pitch" type="revolute">
+    <parent link="pivot_2_yaw"/>
+    <child link="pivot_2_pitch"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="10" velocity="10" lower="-3.14159" upper="3.14159"/>
+  </joint>
+
+  <!-- Roll joint -->
+  <joint name="3_roll" type="revolute">
+    <parent link="pivot_2_pitch"/>
+    <child link="pivot_2"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="10" velocity="10" lower="-3.14159" upper="3.14159"/>
+  </joint>
+
+  <link name="pivot_2_yaw"/>
+  <link name="pivot_2_pitch"/>
+
+  <!-- Joint from ramie to rod -->
+  <!-- Yaw joint -->
+  <joint name="7_yaw" type="revolute">
+    <parent link="ramie"/>
+    <child link="rod_yaw"/>
+    <origin xyz="-6.93889e-17 -0.0491511 -0.0175" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-3.14159" upper="3.14159"/>
+  </joint>
+
+  <!-- Pitch joint -->
+  <joint name="7_pitch" type="revolute">
+    <parent link="rod_yaw"/>
+    <child link="rod_pitch"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="10" velocity="10" lower="-3.14159" upper="3.14159"/>
+  </joint>
+
+  <!-- Roll joint -->
+  <joint name="7_roll" type="revolute">
+    <parent link="rod_pitch"/>
+    <child link="rod"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="10" velocity="10" lower="-3.14159" upper="3.14159"/>
+  </joint>
+
+  <link name="rod_yaw"/>
+  <link name="rod_pitch"/>
+
+  <!-- Link kolo -->
+  <link name="kolo">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="1e-09"/>
+      <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
+    </inertial>
+    <!-- Part kolo -->
+    <visual>
+      <origin xyz="-1.11022e-16 -5.55112e-17 2.77556e-17" rpy="1.5708 3.80554e-16 0.0912233"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/kolo.stl"/>
+      </geometry>
+      <material name="kolo_material">
+        <color rgba="0.615686 0.811765 0.929412 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-1.11022e-16 -5.55112e-17 2.77556e-17" rpy="1.5708 3.80554e-16 0.0912233"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/kolo.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Joint from ramie to kolo -->
+  <joint name="9" type="revolute">
+    <origin xyz="-0.383022 0.321394 -0.03" rpy="-2.1231e-32 -5.56307e-32 1.71652e-19"/>
+    <parent link="ramie"/>
+    <child link="kolo"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+  </joint>
+  <!-- Link kolo_2 -->
+  <link name="kolo_2">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="1e-09"/>
+      <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
+    </inertial>
+    <!-- Part kolo_2 -->
+    <visual>
+      <origin xyz="0 0 2.77556e-17" rpy="1.5708 7.86336e-32 9.64274e-19"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/kolo.stl"/>
+      </geometry>
+      <material name="kolo_2_material">
+        <color rgba="0.615686 0.811765 0.929412 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 2.77556e-17" rpy="1.5708 7.86336e-32 9.64274e-19"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/kolo.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Joint from ramie to kolo_2 -->
+  <joint name="10" type="revolute">
+    <origin xyz="0.383022 0.321394 -0.03" rpy="1.26873e-15 1.16141e-15 1.66202"/>
+    <parent link="ramie"/>
+    <child link="kolo_2"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+  </joint>
+  <!-- Joint from buda to ramie -->
+  <joint name="4" type="revolute">
+    <origin xyz="-0.194568 0.130832 0.111962" rpy="-1.5708 -0.0804536 -1.5708"/>
+    <parent link="buda"/>
+    <child link="ramie"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+  </joint>
+  <!-- Link ramie_2 -->
+  <link name="ramie_2">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="1e-09"/>
+      <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
+    </inertial>
+    <!-- Part ramie_2 -->
+    <visual>
+      <origin xyz="0 0 -0.005" rpy="1.5708 -1.57728e-33 1.28028e-17"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/ramie.stl"/>
+      </geometry>
+      <material name="ramie_2_material">
+        <color rgba="0.615686 0.811765 0.929412 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.005" rpy="1.5708 -1.57728e-33 1.28028e-17"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/ramie.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Link rod_2 -->
+  <link name="rod_2">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="1e-09"/>
+      <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
+    </inertial>
+    <!-- Part rod_2 -->
+    <visual>
+      <origin xyz="0.0025 2.77556e-17 -0.0745" rpy="-1.5708 -1.5708 0"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/rod.stl"/>
+      </geometry>
+      <material name="rod_2_material">
+        <color rgba="0.615686 0.811765 0.929412 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.0025 2.77556e-17 -0.0745" rpy="-1.5708 -1.5708 0"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/rod.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Link pivot_3 -->
+  <link name="pivot_3">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="1e-09"/>
+      <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
+    </inertial>
+    <!-- Part pivot_3 -->
+    <visual>
+      <origin xyz="-0.217966 -0.00102935 0.00369998" rpy="-2.41283 -0.0169732 -3.13687"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/pivot.stl"/>
+      </geometry>
+      <material name="pivot_3_material">
+        <color rgba="0.615686 0.811765 0.929412 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-0.217966 -0.00102935 0.00369998" rpy="-2.41283 -0.0169732 -3.13687"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/pivot.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Joint from rod_2 to pivot_3 -->
+  <!-- Yaw joint -->
+  <joint name="2_yaw" type="revolute">
+    <parent link="rod_2"/>
+    <child link="pivot_3_yaw"/>
+    <origin xyz="2.77556e-17 2.77556e-17 -0.149" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-3.14159" upper="3.14159"/>
+  </joint>
+
+  <!-- Pitch joint -->
+  <joint name="2_pitch" type="revolute">
+    <parent link="pivot_3_yaw"/>
+    <child link="pivot_3_pitch"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="10" velocity="10" lower="-3.14159" upper="3.14159"/>
+  </joint>
+
+  <!-- Roll joint -->
+  <joint name="2_roll" type="revolute">
+    <parent link="pivot_3_pitch"/>
+    <child link="pivot_3"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="10" velocity="10" lower="-3.14159" upper="3.14159"/>
+  </joint>
+
+  <link name="pivot_3_yaw"/>
+  <link name="pivot_3_pitch"/>
+
+  <!-- Joint from ramie_2 to rod_2 -->
+  <!-- Yaw joint -->
+  <joint name="6_yaw" type="revolute">
+    <parent link="ramie_2"/>
+    <child link="rod_2_yaw"/>
+    <origin xyz="0 -0.0491511 -0.0175" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-3.14159" upper="3.14159"/>
+  </joint>
+
+  <!-- Pitch joint -->
+  <joint name="6_pitch" type="revolute">
+    <parent link="rod_2_yaw"/>
+    <child link="rod_2_pitch"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="10" velocity="10" lower="-3.14159" upper="3.14159"/>
+  </joint>
+
+  <!-- Roll joint -->
+  <joint name="6_roll" type="revolute">
+    <parent link="rod_2_pitch"/>
+    <child link="rod_2"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="10" velocity="10" lower="-3.14159" upper="3.14159"/>
+  </joint>
+
+  <!-- Intermediate links -->
+  <link name="rod_2_yaw"/>
+  <link name="rod_2_pitch"/>
+
+  <!-- Link kolo_3 -->
+  <link name="kolo_3">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="1e-09"/>
+      <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
+    </inertial>
+    <!-- Part kolo_3 -->
+    <visual>
+      <origin xyz="0 0 0" rpy="1.5708 -6.64138e-34 1.83024e-19"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/kolo.stl"/>
+      </geometry>
+      <material name="kolo_3_material">
+        <color rgba="0.615686 0.811765 0.929412 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5708 -6.64138e-34 1.83024e-19"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/kolo.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Joint from ramie_2 to kolo_3 -->
+  <joint name="8" type="revolute">
+    <origin xyz="0.383022 0.321394 -0.03" rpy="-4.80867e-17 1.26887e-16 -3.04018"/>
+    <parent link="ramie_2"/>
+    <child link="kolo_3"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+  </joint>
+  <!-- Link kolo_4 -->
+  <link name="kolo_4">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="1e-09"/>
+      <inertia ixx="1e-09" ixy="0" ixz="0" iyy="1e-09" iyz="0" izz="1e-09"/>
+    </inertial>
+    <!-- Part kolo_4 -->
+    <visual>
+      <origin xyz="2.77556e-17 -5.55112e-17 0" rpy="1.5708 -6.17893e-33 9.74466e-19"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/kolo.stl"/>
+      </geometry>
+      <material name="kolo_4_material">
+        <color rgba="0.615686 0.811765 0.929412 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="2.77556e-17 -5.55112e-17 0" rpy="1.5708 -6.17893e-33 9.74466e-19"/>
+      <geometry>
+        <mesh filename="package://ambition_description/urdf/assets/kolo.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <!-- Joint from ramie_2 to kolo_4 -->
+  <joint name="11" type="revolute">
+    <origin xyz="-0.383022 0.321394 -0.03" rpy="-4.50064e-17 1.26893e-16 -1.46939"/>
+    <parent link="ramie_2"/>
+    <child link="kolo_4"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+  </joint>
+  <!-- Joint from buda to ramie_2 -->
+  <joint name="5" type="revolute">
+    <origin xyz="0.205432 0.130832 0.111962" rpy="-1.5708 -0.108416 1.5708"/>
+    <parent link="buda"/>
+    <child link="ramie_2"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10" velocity="10" lower="-3.141592653589793" upper="3.141592653589793"/>
+  </joint>
+</robot>
