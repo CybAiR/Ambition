@@ -1,3 +1,3 @@
 ## "Ambition" Mars Rover Project
 
-Please read the COMMIT_GUIDELINES.md before commiting guyz
+Please read the cybair_pedia repo before you begin your work guyz
