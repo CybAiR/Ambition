@@ -1,0 +1,7 @@
+{
+    "documentId": "b90d345b7f72f6696c92ef6f",
+    "outputFormat": "urdf",
+    "packageName": "ambition_description/urdf",
+    "robotName": "ambition",
+    "assemblyName": "Assembly 1"
+}
