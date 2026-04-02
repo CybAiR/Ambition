@@ -8,6 +8,10 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(ambition_simulation REQUIRED)
+find_package(ambition_remote REQUIRED)
+find_package(ambition_communication REQUIRED)
+find_package(ambition_control REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -21,4 +25,8 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+install(
+  DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME}
+)
 ament_package()
