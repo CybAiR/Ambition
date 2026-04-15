@@ -11,7 +11,7 @@ def generate_launch_description():
 
     urdf = ParameterValue(
         FileContent(PathJoinSubstitution([
-            FindPackageShare('ambition_description'),
+            FindPackageShare('ambition_simulation'),
             'urdf',
             'robot.urdf'
         ])),
@@ -36,7 +36,7 @@ def generate_launch_description():
             name='rviz2',
             output='screen',
             arguments=['-d', PathJoinSubstitution([
-                FindPackageShare('ambition_description'),
+                FindPackageShare('ambition_simulation'),
                 'rviz',
                 'view.rviz'
             ])]

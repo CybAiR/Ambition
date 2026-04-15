@@ -24,7 +24,7 @@
     <visual>
       <origin xyz="0.0054321 0.480832 0.111962" rpy="0 -0 0"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/buda.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/buda.stl"/>
       </geometry>
       <material name="buda_material">
         <color rgba="0.615686 0.811765 0.929412 1"/>
@@ -33,7 +33,7 @@
     <collision>
       <origin xyz="0.0054321 0.480832 0.111962" rpy="0 -0 0"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/buda.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/buda.stl"/>
       </geometry>
     </collision>
   </link>
@@ -48,7 +48,7 @@
     <visual>
       <origin xyz="-8.67362e-19 0 -0.005" rpy="-3.14159 -1.50463e-36 2.88825e-18"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/pivot.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/pivot.stl"/>
       </geometry>
       <material name="pivot_material">
         <color rgba="0.615686 0.811765 0.929412 1"/>
@@ -57,7 +57,7 @@
     <collision>
       <origin xyz="-8.67362e-19 0 -0.005" rpy="-3.14159 -1.50463e-36 2.88825e-18"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/pivot.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/pivot.stl"/>
       </geometry>
     </collision>
   </link>
@@ -80,7 +80,7 @@
     <visual>
       <origin xyz="-1.38778e-17 0 -0.005" rpy="1.5708 -5.56307e-32 1.71652e-19"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/ramie.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/ramie.stl"/>
       </geometry>
       <material name="ramie_material">
         <color rgba="0.615686 0.811765 0.929412 1"/>
@@ -89,7 +89,7 @@
     <collision>
       <origin xyz="-1.38778e-17 0 -0.005" rpy="1.5708 -5.56307e-32 1.71652e-19"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/ramie.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/ramie.stl"/>
       </geometry>
     </collision>
   </link>
@@ -104,7 +104,7 @@
     <visual>
       <origin xyz="0.0025 0 -0.0745" rpy="1.5708 1.5708 0"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/rod.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/rod.stl"/>
       </geometry>
       <material name="rod_material">
         <color rgba="0.615686 0.811765 0.929412 1"/>
@@ -113,7 +113,7 @@
     <collision>
       <origin xyz="0.0025 0 -0.0745" rpy="1.5708 1.5708 0"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/rod.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/rod.stl"/>
       </geometry>
     </collision>
   </link>
@@ -128,7 +128,7 @@
     <visual>
       <origin xyz="0.217937 0.00468479 -0.00238129" rpy="-2.41143 -0.0109236 -3.1201"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/pivot.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/pivot.stl"/>
       </geometry>
       <material name="pivot_2_material">
         <color rgba="0.615686 0.811765 0.929412 1"/>
@@ -137,7 +137,7 @@
     <collision>
       <origin xyz="0.217937 0.00468479 -0.00238129" rpy="-2.41143 -0.0109236 -3.1201"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/pivot.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/pivot.stl"/>
       </geometry>
     </collision>
   </link>
@@ -214,7 +214,7 @@
     <visual>
       <origin xyz="-1.11022e-16 -5.55112e-17 2.77556e-17" rpy="1.5708 3.80554e-16 0.0912233"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/kolo.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/kolo.stl"/>
       </geometry>
       <material name="kolo_material">
         <color rgba="0.615686 0.811765 0.929412 1"/>
@@ -223,7 +223,7 @@
     <collision>
       <origin xyz="-1.11022e-16 -5.55112e-17 2.77556e-17" rpy="1.5708 3.80554e-16 0.0912233"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/kolo.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/kolo.stl"/>
       </geometry>
     </collision>
   </link>
@@ -246,7 +246,7 @@
     <visual>
       <origin xyz="0 0 2.77556e-17" rpy="1.5708 7.86336e-32 9.64274e-19"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/kolo.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/kolo.stl"/>
       </geometry>
       <material name="kolo_2_material">
         <color rgba="0.615686 0.811765 0.929412 1"/>
@@ -255,7 +255,7 @@
     <collision>
       <origin xyz="0 0 2.77556e-17" rpy="1.5708 7.86336e-32 9.64274e-19"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/kolo.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/kolo.stl"/>
       </geometry>
     </collision>
   </link>
@@ -286,7 +286,7 @@
     <visual>
       <origin xyz="0 0 -0.005" rpy="1.5708 -1.57728e-33 1.28028e-17"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/ramie.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/ramie.stl"/>
       </geometry>
       <material name="ramie_2_material">
         <color rgba="0.615686 0.811765 0.929412 1"/>
@@ -295,7 +295,7 @@
     <collision>
       <origin xyz="0 0 -0.005" rpy="1.5708 -1.57728e-33 1.28028e-17"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/ramie.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/ramie.stl"/>
       </geometry>
     </collision>
   </link>
@@ -310,7 +310,7 @@
     <visual>
       <origin xyz="0.0025 2.77556e-17 -0.0745" rpy="-1.5708 -1.5708 0"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/rod.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/rod.stl"/>
       </geometry>
       <material name="rod_2_material">
         <color rgba="0.615686 0.811765 0.929412 1"/>
@@ -319,7 +319,7 @@
     <collision>
       <origin xyz="0.0025 2.77556e-17 -0.0745" rpy="-1.5708 -1.5708 0"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/rod.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/rod.stl"/>
       </geometry>
     </collision>
   </link>
@@ -334,7 +334,7 @@
     <visual>
       <origin xyz="-0.217966 -0.00102935 0.00369998" rpy="-2.41283 -0.0169732 -3.13687"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/pivot.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/pivot.stl"/>
       </geometry>
       <material name="pivot_3_material">
         <color rgba="0.615686 0.811765 0.929412 1"/>
@@ -343,7 +343,7 @@
     <collision>
       <origin xyz="-0.217966 -0.00102935 0.00369998" rpy="-2.41283 -0.0169732 -3.13687"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/pivot.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/pivot.stl"/>
       </geometry>
     </collision>
   </link>
@@ -421,7 +421,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="1.5708 -6.64138e-34 1.83024e-19"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/kolo.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/kolo.stl"/>
       </geometry>
       <material name="kolo_3_material">
         <color rgba="0.615686 0.811765 0.929412 1"/>
@@ -430,7 +430,7 @@
     <collision>
       <origin xyz="0 0 0" rpy="1.5708 -6.64138e-34 1.83024e-19"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/kolo.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/kolo.stl"/>
       </geometry>
     </collision>
   </link>
@@ -453,7 +453,7 @@
     <visual>
       <origin xyz="2.77556e-17 -5.55112e-17 0" rpy="1.5708 -6.17893e-33 9.74466e-19"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/kolo.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/kolo.stl"/>
       </geometry>
       <material name="kolo_4_material">
         <color rgba="0.615686 0.811765 0.929412 1"/>
@@ -462,7 +462,7 @@
     <collision>
       <origin xyz="2.77556e-17 -5.55112e-17 0" rpy="1.5708 -6.17893e-33 9.74466e-19"/>
       <geometry>
-        <mesh filename="package://ambition_description/urdf/assets/kolo.stl"/>
+        <mesh filename="package://ambition_simulation/urdf/assets/kolo.stl"/>
       </geometry>
     </collision>
   </link>
