@@ -12,64 +12,181 @@ class MotorControl : public rclcpp::Node
   public:
     MotorControl() : Node("motor_control")
     {
-        pAdd_devices_client = create_client<candle_ros2::srv::AddDevices>("/md/add_mds");
-        pEnable_client      = create_client<candle_ros2::srv::Generic>("/md/enable");
-        pDisable_client     = create_client<candle_ros2::srv::Generic>("/md/disable");
-        pSetMode_client     = create_client<candle_ros2::srv::SetMode>("/md/set_mode");
+        pAdd_devices_client_ = create_client<candle_ros2::srv::AddDevices>("/md/add_mds");
+        pEnable_client_      = create_client<candle_ros2::srv::Generic>("/md/enable");
+        pDisable_client_     = create_client<candle_ros2::srv::Generic>("/md/disable");
+        pSetMode_client_     = create_client<candle_ros2::srv::SetMode>("/md/set_mode");
+
+        pMotion_publisher_ =
+            this->create_publisher<candle_ros2::msg::MotionCmd>("/md/motion_command", 10);
+        // 1kHz
+        pTimer_ = this->create_wall_timer(std::chrono::microseconds(1),
+                                          std::bind(&MotorControl::motionCallback, this));
     };
 
-    ~MotorControl() {};
+    ~MotorControl() = default;
 
     void init()
     {
-        while (!pAdd_devices_client->wait_for_service(std::chrono::seconds(1)))
+        // addDevice
         {
-            if (!rclcpp::ok())
+            while (!pAdd_devices_client_->wait_for_service(std::chrono::seconds(1)))
             {
-                RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for service");
+                if (!rclcpp::ok())
+                {
+                    RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for service");
+                    return;
+                }
+
+                RCLCPP_INFO(this->get_logger(), "Waiting for /md/add_mds service...");
+            }
+
+            auto request        = std::make_shared<candle_ros2::srv::AddDevices::Request>();
+            request->device_ids = device_ids_;
+
+            auto future = pAdd_devices_client_->async_send_request(request);
+            auto result = rclcpp::spin_until_future_complete(shared_from_this(), future);
+
+            if (result != rclcpp::FutureReturnCode::SUCCESS)
+            {
+                RCLCPP_ERROR(this->get_logger(), "Service call failed");
                 return;
             }
 
-            RCLCPP_INFO(this->get_logger(), "Waiting for /md/add_mds service...");
-        }
+            auto response = future.get();
 
-        auto request        = std::make_shared<candle_ros2::srv::AddDevices::Request>();
-        request->device_ids = {509, 510, 511, 512};
+            bool all_ok = true;
+            for (size_t i = 0; i < response->success.size(); ++i)
+                if (!response->success[i])
+                {
+                    all_ok = false;
+                    RCLCPP_ERROR(
+                        this->get_logger(), "Failed to add motor %d", request->device_ids[i]);
+                }
 
-        auto future = pAdd_devices_client->async_send_request(request);
-        auto result = rclcpp::spin_until_future_complete(shared_from_this(), future);
-
-        if (result != rclcpp::FutureReturnCode::SUCCESS)
-        {
-            RCLCPP_ERROR(this->get_logger(), "Service call failed");
-            return;
-        }
-
-        auto response = future.get();
-
-        bool all_ok = true;
-        for (size_t i = 0; i < response->success.size(); ++i)
-            if (!response->success[i])
+            if (!all_ok)
             {
-                all_ok = false;
-                RCLCPP_ERROR(
-                    this->get_logger(), "Motor %d failed to initialize", request->device_ids[i]);
+                RCLCPP_INFO(this->get_logger(), "Motor initialization failed");
+                return;
             }
 
-        if (!all_ok)
-        {
-            RCLCPP_INFO(this->get_logger(), "Motor initialization failed");
-            return;
+            RCLCPP_INFO(this->get_logger(), "Added motors successfully");
         }
 
-        RCLCPP_INFO(this->get_logger(), "Motor initialization completed successfully");
+        // enable
+        {
+            while (!pEnable_client_->wait_for_service(std::chrono::seconds(1)))
+            {
+                if (!rclcpp::ok())
+                {
+                    RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for service");
+                    return;
+                }
+
+                RCLCPP_INFO(this->get_logger(), "Waiting for /md/enable service...");
+            }
+
+            auto request        = std::make_shared<candle_ros2::srv::Generic::Request>();
+            request->device_ids = device_ids_;
+
+            auto future = pEnable_client_->async_send_request(request);
+            auto result = rclcpp::spin_until_future_complete(shared_from_this(), future);
+
+            if (result != rclcpp::FutureReturnCode::SUCCESS)
+            {
+                RCLCPP_ERROR(this->get_logger(), "Service call failed");
+                return;
+            }
+
+            auto response = future.get();
+
+            bool all_ok = true;
+            for (size_t i = 0; i < response->success.size(); ++i)
+                if (!response->success[i])
+                {
+                    all_ok = false;
+                    RCLCPP_ERROR(
+                        this->get_logger(), "Failed to enable motor %d", request->device_ids[i]);
+                }
+
+            if (!all_ok)
+            {
+                RCLCPP_INFO(this->get_logger(), "Motor initialization failed");
+                return;
+            }
+
+            RCLCPP_INFO(this->get_logger(), "Enabled motors successfully");
+        }
+
+        // setMode
+        {
+            while (!pSetMode_client_->wait_for_service(std::chrono::seconds(1)))
+            {
+                if (!rclcpp::ok())
+                {
+                    RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for service");
+                    return;
+                }
+
+                RCLCPP_INFO(this->get_logger(), "Waiting for /md/set_mode service...");
+            }
+
+            auto request        = std::make_shared<candle_ros2::srv::SetMode::Request>();
+            request->device_ids = device_ids_;
+            request->mode       = {"VELOCITY_PID", "VELOCITY_PID", "VELOCITY_PID", "VELOCITY_PID"};
+
+            auto future = pSetMode_client_->async_send_request(request);
+            auto result = rclcpp::spin_until_future_complete(shared_from_this(), future);
+
+            if (result != rclcpp::FutureReturnCode::SUCCESS)
+            {
+                RCLCPP_ERROR(this->get_logger(), "Service call failed");
+                return;
+            }
+
+            auto response = future.get();
+
+            bool all_ok = true;
+            for (size_t i = 0; i < response->success.size(); ++i)
+                if (!response->success[i])
+                {
+                    all_ok = false;
+                    RCLCPP_ERROR(
+                        this->get_logger(), "Failed set motor %d mode", request->device_ids[i]);
+                }
+
+            if (!all_ok)
+            {
+                RCLCPP_INFO(this->get_logger(), "Motor initialization failed");
+                return;
+            }
+
+            RCLCPP_INFO(this->get_logger(), "Motor initialization completed successfully");
+        }
     }
 
   private:
-    rclcpp::Client<candle_ros2::srv::AddDevices>::SharedPtr pAdd_devices_client = nullptr;
-    rclcpp::Client<candle_ros2::srv::Generic>::SharedPtr    pEnable_client      = nullptr;
-    rclcpp::Client<candle_ros2::srv::Generic>::SharedPtr    pDisable_client     = nullptr;
-    rclcpp::Client<candle_ros2::srv::SetMode>::SharedPtr    pSetMode_client     = nullptr;
+    std::vector<uint16_t> device_ids_ = {509, 510, 511, 512};
+
+    rclcpp::Client<candle_ros2::srv::AddDevices>::SharedPtr pAdd_devices_client_ = nullptr;
+    rclcpp::Client<candle_ros2::srv::Generic>::SharedPtr    pEnable_client_      = nullptr;
+    rclcpp::Client<candle_ros2::srv::Generic>::SharedPtr    pDisable_client_     = nullptr;
+    rclcpp::Client<candle_ros2::srv::SetMode>::SharedPtr    pSetMode_client_     = nullptr;
+
+    rclcpp::Publisher<candle_ros2::msg::MotionCmd>::SharedPtr pMotion_publisher_ = nullptr;
+    rclcpp::TimerBase::SharedPtr                              pTimer_;
+
+  private:
+    void motionCallback()
+    {
+        auto msg            = candle_ros2::msg::MotionCmd();
+        msg.device_ids      = std::vector<uint32_t>(device_ids_.begin(), device_ids_.end());
+        msg.target_position = {0.0, 0.0, 0.0, 0.0};
+        msg.target_torque   = {0.0, 0.0, 0.0, 0.0};
+        msg.target_velocity = {10.0, 10.0, 10.0, 10.0};
+
+        pMotion_publisher_->publish(msg);
+    }
 };
 
 int main(int argc, char* argv[])
