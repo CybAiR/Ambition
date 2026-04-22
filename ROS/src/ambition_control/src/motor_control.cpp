@@ -12,6 +12,8 @@ class MotorControl : public rclcpp::Node
   public:
     MotorControl() : Node("motor_control")
     {
+        using std::placeholders::_1;
+
         pAdd_devices_client_ = create_client<candle_ros2::srv::AddDevices>("/md/add_mds");
         pEnable_client_      = create_client<candle_ros2::srv::Generic>("/md/enable");
         pDisable_client_     = create_client<candle_ros2::srv::Generic>("/md/disable");
@@ -22,6 +24,9 @@ class MotorControl : public rclcpp::Node
         // 1kHz
         pTimer_ = this->create_wall_timer(std::chrono::microseconds(1),
                                           std::bind(&MotorControl::motionCallback, this));
+
+        pCmdVel_subscriber_ = this->create_subscription<geometry_msgs::msg::Twist>(
+            "/cmd_vel", 10, std::bind(&MotorControl::cmdVelCallback, this, _1));
     };
 
     ~MotorControl() = default;
@@ -173,19 +178,47 @@ class MotorControl : public rclcpp::Node
     rclcpp::Client<candle_ros2::srv::Generic>::SharedPtr    pDisable_client_     = nullptr;
     rclcpp::Client<candle_ros2::srv::SetMode>::SharedPtr    pSetMode_client_     = nullptr;
 
-    rclcpp::Publisher<candle_ros2::msg::MotionCmd>::SharedPtr pMotion_publisher_ = nullptr;
-    rclcpp::TimerBase::SharedPtr                              pTimer_;
+    rclcpp::Publisher<candle_ros2::msg::MotionCmd>::SharedPtr  pMotion_publisher_  = nullptr;
+    rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr pCmdVel_subscriber_ = nullptr;
+    rclcpp::TimerBase::SharedPtr                               pTimer_;
+
+    double kv_   = 10.0;
+    double kw_   = 10.0;
+    float  vmax_ = 10.0;
 
   private:
     void motionCallback()
     {
+        return;
         auto msg            = candle_ros2::msg::MotionCmd();
         msg.device_ids      = std::vector<uint32_t>(device_ids_.begin(), device_ids_.end());
         msg.target_position = {0.0, 0.0, 0.0, 0.0};
         msg.target_torque   = {0.0, 0.0, 0.0, 0.0};
-        msg.target_velocity = {10.0, 10.0, 10.0, 10.0};
+        msg.target_velocity = {5.0, 5.0, 5.0, 5.0};
 
         pMotion_publisher_->publish(msg);
+    }
+
+    void cmdVelCallback(const geometry_msgs::msg::Twist::SharedPtr msg)
+    {
+        double v = kv_ * msg->linear.x;
+        double w = kw_ * msg->angular.z;
+        double L = 1;
+
+        float v_left  = v - (L / 2.0) * w;
+        float v_right = v + (L / 2.0) * w;
+
+        // clamp
+        v_left  = std::clamp(v_left, -vmax_, vmax_);
+        v_right = std::clamp(v_right, -vmax_, vmax_);
+
+        auto pub_msg            = candle_ros2::msg::MotionCmd();
+        pub_msg.device_ids      = std::vector<uint32_t>(device_ids_.begin(), device_ids_.end());
+        pub_msg.target_position = {0.0, 0.0, 0.0, 0.0};
+        pub_msg.target_torque   = {0.0, 0.0, 0.0, 0.0};
+        pub_msg.target_velocity = {v_left, -v_right, v_left, -v_right};
+
+        pMotion_publisher_->publish(pub_msg);
     }
 };
 
