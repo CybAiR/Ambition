@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 9
+names: ['Igneous_Basalt', 'Igneous_Diorite', 'Igneous_Granite', 'Metamorphic_Marble', 'Metamorphic_Quartize', 'Sedimentary_Chalk', 'Sedimentary_Limestone', 'Sedimentary_Sandstone', 'Sedimentary_coal']
+
+roboflow:
+  workspace: md--mubin-ul-islam-chowdhury
+  project: rock-detection-lpc70
+  version: 2
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/md--mubin-ul-islam-chowdhury/rock-detection-lpc70/dataset/2

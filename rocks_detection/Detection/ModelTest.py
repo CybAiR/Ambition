@@ -136,7 +136,9 @@ traindata = trdata.flow(x=X_train, y=y_train, batch_size=4)
 tsdata = ImageDataGenerator(horizontal_flip=True, vertical_flip=True, rotation_range=90)
 testdata = tsdata.flow(x=X_test, y=y_test, batch_size=4)
 
-checkpoint = ModelCheckpoint("ieeercnn_vgg16_1.h5", monitor='val_loss', verbose=1, save_best_only=True, save_weights_only=False, mode='auto', save_freq='epoch')
+os.makedirs("depthai_model", exist_ok=True)
+
+checkpoint = ModelCheckpoint("depthai_model/ieeercnn_vgg16_1.h5", monitor='val_loss', verbose=1, save_best_only=True, save_weights_only=True, mode='auto', save_freq='epoch')
 early = EarlyStopping(monitor='val_loss', min_delta=0, patience=100, verbose=1, mode='auto')
 
 hist = model_final.fit(traindata, steps_per_epoch=10, epochs=1000, validation_data=testdata, validation_steps=2, callbacks=[checkpoint, early])
@@ -150,15 +152,28 @@ for e, i in enumerate(os.listdir(path)):
         ss.switchToSelectiveSearchFast()
         ssresults = ss.process()
         imout = img.copy()
-        for e, result in enumerate(ssresults):
-            if e < 2000:
+
+        batch_images = []
+        batch_boxes = []
+
+        for e_ss, result in enumerate(ssresults):
+            if e_ss < 2000:
                 x, y, w, h = result
                 timage = imout[y:y + h, x:x + w]
                 resized = cv2.resize(timage, (224, 224), interpolation=cv2.INTER_AREA)
-                img_array = np.expand_dims(resized, axis=0)
-                out = model_final(img_array, training=False)
-                if out[0][0] > 0.70:
+                batch_images.append(resized)
+                batch_boxes.append((x, y, w, h))
+
+        if len(batch_images) > 0:
+            batch_array = np.array(batch_images)
+
+            out = model_final.predict(batch_array, batch_size=8, verbose=0)
+
+            for idx, prediction in enumerate(out):
+                if prediction[0] > 0.70:
+                    x, y, w, h = batch_boxes[idx]
                     cv2.rectangle(imout, (x, y), (x + w, y + h), (0, 255, 0), 1, cv2.LINE_AA)
+
         plt.figure()
         plt.imshow(imout)
         break
