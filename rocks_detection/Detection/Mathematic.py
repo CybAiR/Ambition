@@ -1,7 +1,10 @@
 import cv2
 import numpy as np
 import os
-
+###################################################
+#BASED ON
+#ROCKSTER: Onboard Rock Segmentation Through Edge Regrouping Michael C. Burl,∗ David R. Thompson,† Charles deGranville,‡ and Benjamin J. Bornstein§ Jet Propulsion Laboratory, Pasadena, California 91109
+###################################################
 
 def segment_sky_ground(img, window_size=11, var_thresh=25.0):
     img_f = img.astype(np.float32)
