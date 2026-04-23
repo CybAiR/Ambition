@@ -14,6 +14,26 @@ class MotorControl : public rclcpp::Node
     {
         using std::placeholders::_1;
 
+        this->declare_parameter<double>("kv", 1);
+        this->declare_parameter<double>("kw", 1);
+        this->declare_parameter<double>("v_max", 10);
+        this->declare_parameter<double>("wheel_base", 10);
+        this->declare_parameter<std::vector<int64_t>>("device_ids", {509, 510, 511, 512});
+
+        kv_          = this->get_parameter("kv").as_double();
+        kw_          = this->get_parameter("kw").as_double();
+        v_max_       = this->get_parameter("v_max").as_double();
+        wheel_base_  = this->get_parameter("wheel_base").as_double();
+        auto tmp_vec = this->get_parameter("device_ids").as_integer_array();
+
+        if (tmp_vec.size() != 4)
+        {
+            RCLCPP_ERROR(this->get_logger(), "Wrong number of device ids");
+            return;
+        }
+
+        device_ids_ = std::vector<uint16_t>(tmp_vec.begin(), tmp_vec.end());
+
         pAdd_devices_client_ = create_client<candle_ros2::srv::AddDevices>("/md/add_mds");
         pEnable_client_      = create_client<candle_ros2::srv::Generic>("/md/enable");
         pDisable_client_     = create_client<candle_ros2::srv::Generic>("/md/disable");
@@ -71,7 +91,7 @@ class MotorControl : public rclcpp::Node
 
             if (!all_ok)
             {
-                RCLCPP_INFO(this->get_logger(), "Motor initialization failed");
+                RCLCPP_ERROR(this->get_logger(), "Motor initialization failed");
                 return;
             }
 
@@ -182,11 +202,11 @@ class MotorControl : public rclcpp::Node
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr pCmdVel_subscriber_ = nullptr;
     rclcpp::TimerBase::SharedPtr                               pTimer_;
 
-    double kv_   = 10.0;
-    double kw_   = 10.0;
-    float  vmax_ = 10.0;
-    double L     = 1;
-    double r     = 0.21;
+    double kv_           = 1.0;
+    double kw_           = 1.0;
+    float  v_max_        = 10.0;
+    double wheel_base_   = 1;
+    double wheel_radius_ = 0.105;
 
   private:
     void motionCallback()
@@ -206,12 +226,12 @@ class MotorControl : public rclcpp::Node
         double v = kv_ * msg->linear.x;
         double w = kw_ * msg->angular.z;
 
-        float v_left  = (v - (L / 2.0) * w) / r;
-        float v_right = (v + (L / 2.0) * w) / r;
+        float v_left  = (v - (wheel_base_ / 2.0) * w) / wheel_radius_;
+        float v_right = (v + (wheel_base_ / 2.0) * w) / wheel_radius_;
 
         // clamp
-        v_left  = std::clamp(v_left, -vmax_, vmax_);
-        v_right = std::clamp(v_right, -vmax_, vmax_);
+        v_left  = std::clamp(v_left, -v_max_, v_max_);
+        v_right = std::clamp(v_right, -v_max_, v_max_);
 
         auto pub_msg            = candle_ros2::msg::MotionCmd();
         pub_msg.device_ids      = std::vector<uint32_t>(device_ids_.begin(), device_ids_.end());
