@@ -1,41 +1,23 @@
 import cv2
-import threading
-import time
+import depthai as dai
 from ultralytics import YOLO
-
-class VideoCamera:
-    def __init__(self, src=0):
-        self.cap = cv2.VideoCapture(src)
-        self.ret, self.frame = self.cap.read()
-        self.running = True
-        self.thread = threading.Thread(target=self.update, daemon=True)
-        self.thread.start()
-
-    def update(self):
-        while self.running:
-            self.ret, self.frame = self.cap.read()
-
-    def get_frame(self):
-        return self.ret, self.frame
-
-    def stop(self):
-        self.running = False
-        self.thread.join()
-        self.cap.release()
 
 if __name__ == "__main__":
     model_path = r"D:\Studia\cybAIR\Ambition\rocks_detection\Detection\runs\detect\depthai_model\yolo_rocks-9\weights\best.pt"
     model = YOLO(model_path)
 
-    cam = VideoCamera(0)
-    time.sleep(2)
+    pipeline = dai.Pipeline()
+
+    cam = pipeline.create(dai.node.Camera).build()
+    videoQueue = cam.requestOutput((1920, 1080)).createOutputQueue()
+
+    pipeline.start()
 
     print("YOLO26 gotowe. Nacisnij 'q' aby wyjsc.")
 
-    while True:
-        ret, frame = cam.get_frame()
-        if not ret:
-            break
+    while pipeline.isRunning():
+        videoIn = videoQueue.get()
+        frame = videoIn.getCvFrame()
 
         results = model.predict(source=frame, conf=0.5, stream=False, verbose=False)
 
@@ -46,5 +28,4 @@ if __name__ == "__main__":
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    cam.stop()
     cv2.destroyAllWindows()
