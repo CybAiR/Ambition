@@ -1,0 +1,3 @@
+[submodule "ROS/src/candle_ros2"]
+	path = ROS/src/candle_ros2
+	url = git@github.com:mabrobotics/candle_ros2.git
