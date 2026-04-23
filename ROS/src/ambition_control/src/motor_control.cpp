@@ -199,7 +199,6 @@ class MotorControl : public rclcpp::Node
 
     rclcpp::Publisher<candle_ros2::msg::MotionCmd>::SharedPtr  pMotion_publisher_  = nullptr;
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr pCmdVel_subscriber_ = nullptr;
-    rclcpp::TimerBase::SharedPtr                               pTimer_;
 
     double kv_           = 1.0;
     double kw_           = 1.0;
