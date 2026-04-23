@@ -185,6 +185,8 @@ class MotorControl : public rclcpp::Node
     double kv_   = 10.0;
     double kw_   = 10.0;
     float  vmax_ = 10.0;
+    double L     = 1;
+    double r     = 0.21;
 
   private:
     void motionCallback()
@@ -203,10 +205,9 @@ class MotorControl : public rclcpp::Node
     {
         double v = kv_ * msg->linear.x;
         double w = kw_ * msg->angular.z;
-        double L = 1;
 
-        float v_left  = v - (L / 2.0) * w;
-        float v_right = v + (L / 2.0) * w;
+        float v_left  = (v - (L / 2.0) * w) / r;
+        float v_right = (v + (L / 2.0) * w) / r;
 
         // clamp
         v_left  = std::clamp(v_left, -vmax_, vmax_);
