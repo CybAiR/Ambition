@@ -18,13 +18,15 @@ class MotorControl : public rclcpp::Node
         this->declare_parameter<double>("kw", 1);
         this->declare_parameter<double>("v_max", 10);
         this->declare_parameter<double>("wheel_base", 10);
+        this->declare_parameter<double>("wheel_radius", 0.105);
         this->declare_parameter<std::vector<int64_t>>("device_ids", {509, 510, 511, 512});
 
-        kv_          = this->get_parameter("kv").as_double();
-        kw_          = this->get_parameter("kw").as_double();
-        v_max_       = this->get_parameter("v_max").as_double();
-        wheel_base_  = this->get_parameter("wheel_base").as_double();
-        auto tmp_vec = this->get_parameter("device_ids").as_integer_array();
+        kv_           = this->get_parameter("kv").as_double();
+        kw_           = this->get_parameter("kw").as_double();
+        v_max_        = this->get_parameter("v_max").as_double();
+        wheel_base_   = this->get_parameter("wheel_base").as_double();
+        wheel_radius_ = this->get_parameter("wheel_radius").as_double();
+        auto tmp_vec  = this->get_parameter("device_ids").as_integer_array();
 
         if (tmp_vec.size() != 4)
         {
@@ -41,9 +43,6 @@ class MotorControl : public rclcpp::Node
 
         pMotion_publisher_ =
             this->create_publisher<candle_ros2::msg::MotionCmd>("/md/motion_command", 10);
-        // 1kHz
-        pTimer_ = this->create_wall_timer(std::chrono::microseconds(1),
-                                          std::bind(&MotorControl::motionCallback, this));
 
         pCmdVel_subscriber_ = this->create_subscription<geometry_msgs::msg::Twist>(
             "/cmd_vel", 10, std::bind(&MotorControl::cmdVelCallback, this, _1));
@@ -209,18 +208,6 @@ class MotorControl : public rclcpp::Node
     double wheel_radius_ = 0.105;
 
   private:
-    void motionCallback()
-    {
-        return;
-        auto msg            = candle_ros2::msg::MotionCmd();
-        msg.device_ids      = std::vector<uint32_t>(device_ids_.begin(), device_ids_.end());
-        msg.target_position = {0.0, 0.0, 0.0, 0.0};
-        msg.target_torque   = {0.0, 0.0, 0.0, 0.0};
-        msg.target_velocity = {5.0, 5.0, 5.0, 5.0};
-
-        pMotion_publisher_->publish(msg);
-    }
-
     void cmdVelCallback(const geometry_msgs::msg::Twist::SharedPtr msg)
     {
         double v = kv_ * msg->linear.x;
@@ -229,7 +216,6 @@ class MotorControl : public rclcpp::Node
         float v_left  = (v - (wheel_base_ / 2.0) * w) / wheel_radius_;
         float v_right = (v + (wheel_base_ / 2.0) * w) / wheel_radius_;
 
-        // clamp
         v_left  = std::clamp(v_left, -v_max_, v_max_);
         v_right = std::clamp(v_right, -v_max_, v_max_);
 

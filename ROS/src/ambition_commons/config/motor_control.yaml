@@ -9,4 +9,5 @@
     kw: 1.0
     v_max: 10.0
     wheel_base: 10.0
+    wheel_radius: 0.105
 
