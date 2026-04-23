@@ -20,7 +20,11 @@ def generate_launch_description():
         package='ambition_control',
         executable='motor_control',
         name='motor_control',
-        parameters=['/root/Shared/Ambition/ROS/src/ambition_commons/config/motor_control.yaml']
+        parameters=[os.path.join(
+            get_package_share_directory('ambition_commons'),
+            'config',
+            'motor_control.yaml'
+        )]
     )
 
     return LaunchDescription([
