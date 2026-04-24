@@ -7,7 +7,10 @@ Clone this repo with submodules:
 ```
 git clone --recurse-submodules git@github.com:CybAiR/Ambition.git
 ```
-
+or if already cloned
+```
+git submodule update --init --recursive
+```
 ## Building
 If you encounter an error while building:
 
