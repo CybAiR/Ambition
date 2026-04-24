@@ -1,0 +1,13 @@
+/motor_control:
+  ros__parameters:
+    device_ids:
+    - 509
+    - 510
+    - 511
+    - 512
+    kv: 1.0
+    kw: 1.0
+    v_max: 10.0
+    wheel_base: 10.0
+    wheel_radius: 0.105
+
