@@ -15,6 +15,8 @@ set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/imgui)
 # Create the executable and compile ImGui directly into it
 add_executable(rover_ui 
     src/main.cpp
+    src/panels/TopPanel.cpp
+    src/panels/SidePanel.cpp
     ${IMGUI_DIR}/imgui.cpp
     ${IMGUI_DIR}/imgui_demo.cpp
     ${IMGUI_DIR}/imgui_draw.cpp
