@@ -17,6 +17,11 @@ add_executable(rover_ui
     src/main.cpp
     src/panels/TopPanel.cpp
     src/panels/SidePanel.cpp
+    src/views/View.cpp
+    src/views/MaintenanceView.cpp
+    src/views/NavigationView.cpp
+    src/views/ProbingView.cpp
+    src/views/ScienceView.cpp
     ${IMGUI_DIR}/imgui.cpp
     ${IMGUI_DIR}/imgui_demo.cpp
     ${IMGUI_DIR}/imgui_draw.cpp
