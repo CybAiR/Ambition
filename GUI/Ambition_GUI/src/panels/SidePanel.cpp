@@ -14,15 +14,16 @@ SidePanel::SidePanel(ImGuiWindowFlags side_panel_flags)
 void SidePanel::generate_logo() const
 {
     ImGui::Spacing();
-    ImGui::SetWindowFontScale(2.0f);
+    ImFont* logo_font = ImGui::GetIO().Fonts->Fonts[2];
+    ImGui::PushFont(logo_font);
     ImVec2 text_size = ImGui::CalcTextSize("Ambition GUI");
     ImGui::SetCursorPosX((this->width - text_size.x) * 0.5f);
     ImGui::TextColored(this->logo_color, "Ambition GUI");
+    ImGui::PopFont();
     ImGui::Spacing();
-    ImGui::SetWindowFontScale(1.5f);
 }
 
-void SidePanel::generate_side_buttons(const ImGuiViewport* viewport) const
+void SidePanel::generate_side_buttons(const ImGuiViewport* viewport, Views& active_view)
 {
     ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.1f, 0.5f));
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 2.0f);
@@ -35,10 +36,27 @@ void SidePanel::generate_side_buttons(const ImGuiViewport* viewport) const
 
     ImVec2 side_btn_size(this->width, this->side_btn_height);
 
-    ImGui::Button("Science", side_btn_size);
-    ImGui::Button("Navigation", side_btn_size);
-    ImGui::Button("Maintenance", side_btn_size);
-    ImGui::Button("Probing", side_btn_size);
+    if (ImGui::Button("Science", side_btn_size))
+    {
+        active_view = Views::Science;
+    }
+
+    if (ImGui::Button("Navigation", side_btn_size))
+    {
+        active_view = Views::Navigation;
+    }
+
+
+    if (ImGui::Button("Maintance", side_btn_size))
+    {
+        active_view = Views::Maintenance;
+    }
+
+
+    if (ImGui::Button("Probing", side_btn_size))
+    {
+        active_view = Views::Probing;
+    }
 
     ImGui::PopStyleColor(4);
     ImGui::PopStyleVar(3);
@@ -68,7 +86,7 @@ void SidePanel::generate_link(const ImGuiViewport* viewport) const
     ImGui::PopStyleColor(5);
 }
 
-void SidePanel::render(const ImGuiViewport* viewport) const 
+void SidePanel::render(const ImGuiViewport* viewport, Views& active_view)
 {
     ImVec2 side_panel_pos(
         viewport->WorkPos.x,
@@ -87,7 +105,7 @@ void SidePanel::render(const ImGuiViewport* viewport) const
     ImGui::Begin("SidePanel", nullptr, side_panel_flags);
 
     generate_logo();
-    generate_side_buttons(viewport);
+    generate_side_buttons(viewport, active_view);
     generate_link(viewport);
     
     ImGui::PopStyleVar(1);

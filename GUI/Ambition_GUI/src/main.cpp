@@ -1,3 +1,5 @@
+#include <filesystem>
+
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_opengl3.h"
@@ -7,13 +9,18 @@
 #include "panels/SidePanel.h"
 #include <iostream>
 
+#include "views/ScienceView.h"
+
 int main(int argc, char* argv[]) 
 {
-
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
     ImGuiIO& io = ImGui::GetIO();
+
+    ImFont* main_font = io.Fonts->AddFontFromFileTTF("CourierPrime-Regular.ttf", 15.0f);
+    ImFont* bold_font = io.Fonts->AddFontFromFileTTF("CourierPrime-Bold.ttf", 15.0f);
+    ImFont* logo_font = io.Fonts->AddFontFromFileTTF("CourierPrime-Bold.ttf", 32.0f);
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
@@ -38,6 +45,9 @@ int main(int argc, char* argv[])
 
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init("#version 130");
+
+    Views active_view = Views::Science;
+    ScienceView science_view;
 
     
 
@@ -94,12 +104,36 @@ int main(int argc, char* argv[])
         (
             side_panel_flags
         );
-        side_panel.render(viewport);
+        side_panel.render(viewport, active_view);
 
         
-        // VIEWS TO ADD
-        // ...
-        
+        // VIEWS
+        ImVec2 main_view_pos(viewport->WorkPos.x + side_panel.get_width(), viewport->WorkPos.y + 75.0f);
+        ImVec2 main_view_size(viewport->WorkSize.x - side_panel.get_width(), viewport->WorkSize.y - 75.0f);
+
+        ImGui::SetNextWindowPos(main_view_pos);
+        ImGui::SetNextWindowSize(main_view_size);
+
+        ImGui::Begin("MainView", nullptr, main_view_flags);
+
+        switch (active_view)
+        {
+        case Views::Science:
+            science_view.Render(); // Odpalenie logiki z poprzednich kroków
+            break;
+        case Views::Navigation:
+            ImGui::Text("Widok nawigacji (w budowie)");
+            break;
+        case Views::Maintenance:
+            ImGui::Text("Widok utrzymania (w budowie)");
+            break;
+        case Views::Probing:
+            ImGui::Text("Widok próbkowania (w budowie)");
+            break;
+        }
+
+        ImGui::End();
+
         ImGui::Render();
         glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
