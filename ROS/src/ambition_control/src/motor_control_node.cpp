@@ -7,10 +7,10 @@
 
 #include "candle_ros2/msg/motion_cmd.hpp"
 
-class MotorControl : public rclcpp::Node
+class MotorControlNode : public rclcpp::Node
 {
   public:
-    MotorControl() : Node("motor_control")
+    MotorControlNode() : Node("motor_control_node")
     {
         using std::placeholders::_1;
 
@@ -45,10 +45,10 @@ class MotorControl : public rclcpp::Node
             this->create_publisher<candle_ros2::msg::MotionCmd>("/md/motion_command", 10);
 
         pCmdVel_subscriber_ = this->create_subscription<geometry_msgs::msg::Twist>(
-            "/cmd_vel", 10, std::bind(&MotorControl::cmdVelCallback, this, _1));
+            "/cmd_vel", 10, std::bind(&MotorControlNode::cmdVelCallback, this, _1));
     };
 
-    ~MotorControl() = default;
+    ~MotorControlNode() = default;
 
     void init()
     {
@@ -231,7 +231,7 @@ class MotorControl : public rclcpp::Node
 int main(int argc, char* argv[])
 {
     rclcpp::init(argc, argv);
-    auto node = std::make_shared<MotorControl>();
+    auto node = std::make_shared<MotorControlNode>();
     node->init();
 
     rclcpp::spin(node);
