@@ -29,12 +29,14 @@ add_executable(rover_ui
     ${IMGUI_DIR}/imgui_widgets.cpp
     ${IMGUI_DIR}/backends/imgui_impl_sdl2.cpp
     ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
+        src/views/ScienceView.h
 )
 
 # Tell the compiler where to find the ImGui header files (.h)
 target_include_directories(rover_ui PRIVATE 
     ${IMGUI_DIR} 
     ${IMGUI_DIR}/backends
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/enums
 )
 
 # Link SDL2 and OpenGL
