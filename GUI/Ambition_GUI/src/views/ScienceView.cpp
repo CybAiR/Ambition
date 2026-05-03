@@ -1,45 +1,25 @@
 #include "ScienceView.h"
 
 #include <imgui.h>
-
 #include <cstdarg>
 
 namespace
 {
-    constexpr float kRightPanelWidth = 300.0f;
+    constexpr float kRightPanelWidth = 400.0f;
     constexpr float kMinLeftWidth = 240.0f;
     constexpr float kMinRightWidth = 180.0f;
 
     constexpr float kOuterPadX = 10.0f;
     constexpr float kOuterPadY = 10.0f;
 
-    constexpr float kHeaderHeight = 28.0f;
-    constexpr float kGpsCardHeight = 116.0f;
     constexpr float kBottomPanelHeight = 170.0f;
 
-    constexpr float kCardPadX = 12.0f;
     constexpr float kSectionPadX = 16.0f;
-
-    constexpr float kLabelX = 30.0f;
-    constexpr float kValueX = 145.0f;
 
     constexpr float kSlotButtonSize = 32.0f;
     constexpr float kSlotCellWidth = 72.0f;
 
     const ImVec4 kPanelBg = ImVec4(0.08f, 0.08f, 0.08f, 1.0f);
-    const ImVec4 kCardBg = ImVec4(0.13f, 0.13f, 0.13f, 1.0f);
-    const ImVec4 kHeaderBg = ImVec4(0.16f, 0.16f, 0.16f, 1.0f);
-    const ImVec4 kBorder = ImVec4(0.24f, 0.24f, 0.24f, 1.0f);
-
-    const ImVec4 kTitleText = ImVec4(0.92f, 0.92f, 0.92f, 1.0f);
-    const ImVec4 kMutedText = ImVec4(0.62f, 0.62f, 0.62f, 1.0f);
-    const ImVec4 kSectionText = ImVec4(0.50f, 0.50f, 0.50f, 1.0f);
-
-    const ImVec4 kGreen = ImVec4(0.55f, 0.95f, 0.65f, 1.0f);
-    const ImVec4 kBlue = ImVec4(0.45f, 0.65f, 1.00f, 1.0f);
-    const ImVec4 kPurple = ImVec4(0.85f, 0.65f, 1.00f, 1.0f);
-    const ImVec4 kOrange = ImVec4(1.00f, 0.70f, 0.25f, 1.0f);
-
     const ImVec4 kDrillStateText = ImVec4(0.30f, 0.50f, 0.90f, 1.0f);
 
     const ImVec4 kStartButton = ImVec4(0.15f, 0.35f, 0.15f, 1.0f);
@@ -52,14 +32,6 @@ namespace
     const ImVec4 kSlotGreenFilled = ImVec4(0.18f, 0.49f, 0.20f, 0.4f);
     const ImVec4 kSlotGreenHover = ImVec4(0.18f, 0.49f, 0.20f, 0.6f);
     const ImVec4 kTransparent = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
-
-    constexpr ImGuiWindowFlags kNoScrollFlags =
-        ImGuiWindowFlags_NoScrollbar |
-        ImGuiWindowFlags_NoScrollWithMouse;
-
-    constexpr ImGuiWindowFlags kNoScrollNoBgFlags =
-        kNoScrollFlags |
-        ImGuiWindowFlags_NoBackground;
 
     float Max(float a, float b) noexcept
     {
@@ -75,107 +47,6 @@ namespace
             return max_value;
 
         return value;
-    }
-
-    void DrawHeader(
-        const char* title,
-        const ImVec4& text_color = kTitleText,
-        float text_x = kCardPadX,
-        float text_y = 5.0f
-    )
-    {
-        ImDrawList* draw_list = ImGui::GetWindowDrawList();
-
-        const ImVec2 pos = ImGui::GetWindowPos();
-        const ImVec2 size = ImGui::GetWindowSize();
-
-        draw_list->AddRectFilled(
-            pos,
-            ImVec2(pos.x + size.x, pos.y + kHeaderHeight),
-            ImGui::GetColorU32(kHeaderBg)
-        );
-
-        draw_list->AddLine(
-            ImVec2(pos.x, pos.y + kHeaderHeight),
-            ImVec2(pos.x + size.x, pos.y + kHeaderHeight),
-            ImGui::GetColorU32(kBorder)
-        );
-
-        draw_list->AddRect(
-            pos,
-            ImVec2(pos.x + size.x, pos.y + size.y),
-            ImGui::GetColorU32(kBorder)
-        );
-
-        ImGui::SetCursorPos(ImVec2(text_x, text_y));
-        ImGui::TextColored(text_color, "%s", title);
-
-        ImGui::SetCursorPos(ImVec2(kCardPadX, kHeaderHeight + 10.0f));
-    }
-
-    bool BeginCard(const char* id, const ImVec2& size)
-    {
-        ImGui::PushStyleColor(ImGuiCol_ChildBg, kCardBg);
-        ImGui::PushStyleColor(ImGuiCol_Border, kBorder);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-
-        return ImGui::BeginChild(id, size, true, kNoScrollFlags);
-    }
-
-    void EndCard()
-    {
-        ImGui::EndChild();
-
-        ImGui::PopStyleVar();
-        ImGui::PopStyleColor(2);
-    }
-
-    void ValueRow(
-        float label_x,
-        float value_x,
-        const ImVec4& value_color,
-        const char* label,
-        const char* fmt,
-        ...
-    ) IM_FMTARGS(5);
-
-    void ValueRow(
-        float label_x,
-        float value_x,
-        const ImVec4& value_color,
-        const char* label,
-        const char* fmt,
-        ...
-    )
-    {
-        ImGui::SetCursorPosX(label_x);
-        ImGui::TextColored(kMutedText, "%s", label);
-
-        ImGui::SameLine(value_x);
-
-        va_list args;
-        va_start(args, fmt);
-        ImGui::TextColoredV(value_color, fmt, args);
-        va_end(args);
-    }
-
-    void InnerSeparator()
-    {
-        ImGui::Dummy(ImVec2(0.0f, 6.0f));
-
-        ImDrawList* draw_list = ImGui::GetWindowDrawList();
-
-        const ImVec2 pos = ImGui::GetWindowPos();
-        const ImVec2 size = ImGui::GetWindowSize();
-        const float y = ImGui::GetCursorScreenPos().y;
-
-        draw_list->AddLine(
-            ImVec2(pos.x + kCardPadX, y),
-            ImVec2(pos.x + size.x - kCardPadX, y),
-            ImGui::GetColorU32(kBorder)
-        );
-
-        ImGui::Dummy(ImVec2(0.0f, 10.0f));
     }
 
     bool ColoredButton(
@@ -196,6 +67,9 @@ namespace
         return clicked;
     }
 }
+
+// Constructor passes flags up to base View
+ScienceView::ScienceView(ImGuiWindowFlags flags) : View(flags) {}
 
 ScienceView::Action ScienceView::Render()
 {
@@ -257,20 +131,6 @@ ScienceView::Action ScienceView::RenderLeftColumn(
     return action;
 }
 
-void ScienceView::RenderCameraContainer(float height) const
-{
-    if (ImGui::BeginChild(
-        "CameraContainer",
-        ImVec2(0.0f, height),
-        true,
-        kNoScrollFlags
-    )) {
-        // Tutaj można narysować tło, teksturę lub podgląd kamery.
-    }
-
-    ImGui::EndChild();
-}
-
 ScienceView::Action ScienceView::RenderBottomPanel(const State& state) const
 {
     Action action = Action::None;
@@ -283,7 +143,8 @@ ScienceView::Action ScienceView::RenderBottomPanel(const State& state) const
         true,
         kNoScrollFlags
     )) {
-        DrawHeader("SAMPLE DATA", kTitleText, 10.0f, 5.0f);
+        // Changed to use the base View DrawHeader signature
+        DrawHeader("SAMPLE DATA"); 
 
         ImGui::SetCursorPos(ImVec2(0.0f, kHeaderHeight + 6.0f));
 
@@ -539,7 +400,7 @@ bool ScienceView::RenderSlotButton(
     const char* label,
     bool is_filled,
     float cell_width
-)
+) const
 {
     ImGui::BeginGroup();
 
@@ -585,19 +446,6 @@ bool ScienceView::RenderSlotButton(
     return clicked;
 }
 
-void ScienceView::RenderGpsCard(const GpsOdometry& gps) const
-{
-    if (BeginCard("GpsCard", ImVec2(0.0f, kGpsCardHeight))) {
-        DrawHeader("GPS / ODOMETRY");
-
-        ValueRow(kLabelX, kValueX, kGreen, "LAT:", "%.4f N", gps.lat);
-        ValueRow(kLabelX, kValueX, kGreen, "LON:", "%.4f W", gps.lon);
-        ValueRow(kLabelX, kValueX, kGreen, "ALT:", "%.1f m", gps.alt_m);
-    }
-
-    EndCard();
-}
-
 void ScienceView::RenderArmTelemetryCard(
     const ArmTelemetry& arm,
     const GripperTelemetry& gripper
@@ -627,7 +475,7 @@ void ScienceView::RenderArmTelemetryCard(
             ValueRow(kLabelX, kValueX, kBlue, row.label, "%.0f°", row.value);
         }
 
-        InnerSeparator();
+        View::InnerSeparator();
 
         const FloatRow position[] = {
             { "X:", arm.ee_x_m },
@@ -643,7 +491,7 @@ void ScienceView::RenderArmTelemetryCard(
             ValueRow(kLabelX, kValueX, kPurple, row.label, "%.2f m", row.value);
         }
 
-        InnerSeparator();
+        View::InnerSeparator();
 
         ImGui::SetCursorPosX(kCardPadX);
         ImGui::TextColored(kMutedText, "GRIPPER STATE");
