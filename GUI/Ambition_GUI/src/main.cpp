@@ -1,26 +1,26 @@
 #include <filesystem>
 
 #include "imgui.h"
-#include "imgui_impl_sdl2.h"
 #include "imgui_impl_opengl3.h"
+#include "imgui_impl_sdl2.h"
+#include "panels/SidePanel.h"
+#include "panels/TopPanel.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
-#include "panels/TopPanel.h"
-#include "panels/SidePanel.h"
 #include <iostream>
 
 #include "views/ScienceView.h"
 
-int main(int argc, char* argv[]) 
+int main(int argc, char* argv[])
 {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
     ImGuiIO& io = ImGui::GetIO();
 
-    ImFont* main_font = io.Fonts->AddFontFromFileTTF("CourierPrime-Regular.ttf", 15.0f);
-    ImFont* bold_font = io.Fonts->AddFontFromFileTTF("CourierPrime-Bold.ttf", 15.0f);
-    ImFont* logo_font = io.Fonts->AddFontFromFileTTF("CourierPrime-Bold.ttf", 32.0f);
+    ImFont* main_font = io.Fonts->AddFontFromFileTTF("../misc/fonts/Roboto-Medium.ttf", 15.0f);
+    ImFont* bold_font = io.Fonts->AddFontFromFileTTF("../misc/fonts/Roboto-Medium.ttf", 15.0f);
+    ImFont* logo_font = io.Fonts->AddFontFromFileTTF("../misc/fonts/Roboto-Medium.ttf", 32.0f);
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
@@ -32,12 +32,8 @@ int main(int argc, char* argv[])
     style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.40f, 0.40f, 0.40f, 1.00f);
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
-    SDL_Window* window = SDL_CreateWindow("App", 
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED, 
-        1280, 720, 
-        SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
-    );
+    SDL_Window* window = SDL_CreateWindow("App", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                                          1280, 720, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
     SDL_GLContext gl_context = SDL_GL_CreateContext(window);
     SDL_GL_MakeCurrent(window, gl_context);
@@ -49,67 +45,51 @@ int main(int argc, char* argv[])
     Views active_view = Views::Science;
     ScienceView science_view;
 
-    
-
     bool done = false;
-    while (!done) 
+    while (!done)
     {
         SDL_Event event;
-        while (SDL_PollEvent(&event)) 
+        while (SDL_PollEvent(&event))
         {
             ImGui_ImplSDL2_ProcessEvent(&event);
             if (event.type == SDL_QUIT)
                 done = true;
         }
-        
+
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
-        
 
         // UI code
 
         const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-        ImGuiWindowFlags side_panel_flags =
-                                    ImGuiWindowFlags_NoTitleBar |
-                                    ImGuiWindowFlags_NoResize | 
-                                    ImGuiWindowFlags_NoMove |
-                                    ImGuiWindowFlags_NoCollapse;
+        ImGuiWindowFlags side_panel_flags = ImGuiWindowFlags_NoTitleBar |
+                                            ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+                                            ImGuiWindowFlags_NoCollapse;
 
-        ImGuiWindowFlags main_view_flags = ImGuiWindowFlags_NoTitleBar | 
-                                    ImGuiWindowFlags_NoResize | 
-                                    ImGuiWindowFlags_NoMove | 
-                                    ImGuiWindowFlags_NoScrollbar | 
-                                    ImGuiWindowFlags_NoSavedSettings | 
-                                    ImGuiWindowFlags_NoCollapse;
+        ImGuiWindowFlags main_view_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+                                           ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
+                                           ImGuiWindowFlags_NoSavedSettings |
+                                           ImGuiWindowFlags_NoCollapse;
 
-        ImGuiWindowFlags top_panel_flags = ImGuiWindowFlags_NoTitleBar |
-                                    ImGuiWindowFlags_NoResize |
-                                    ImGuiWindowFlags_NoMove |
-                                    ImGuiWindowFlags_NoCollapse;
+        ImGuiWindowFlags top_panel_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+                                           ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse;
 
         // TOP PANEL
         float size_x = viewport->WorkSize.x;
-        TopPanel top_panel
-        (
-            size_x,
-            top_panel_flags
-        );
+        TopPanel top_panel(size_x, top_panel_flags);
         top_panel.render(viewport);
-        
 
         // SIDE PANEL
-        SidePanel side_panel
-        (
-            side_panel_flags
-        );
+        SidePanel side_panel(side_panel_flags);
         side_panel.render(viewport, active_view);
 
-        
         // VIEWS
-        ImVec2 main_view_pos(viewport->WorkPos.x + side_panel.get_width(), viewport->WorkPos.y + 75.0f);
-        ImVec2 main_view_size(viewport->WorkSize.x - side_panel.get_width(), viewport->WorkSize.y - 75.0f);
+        ImVec2 main_view_pos(viewport->WorkPos.x + side_panel.get_width(),
+                             viewport->WorkPos.y + 75.0f);
+        ImVec2 main_view_size(viewport->WorkSize.x - side_panel.get_width(),
+                              viewport->WorkSize.y - 75.0f);
 
         ImGui::SetNextWindowPos(main_view_pos);
         ImGui::SetNextWindowSize(main_view_size);
