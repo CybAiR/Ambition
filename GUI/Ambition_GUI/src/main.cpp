@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
     ImGui_ImplOpenGL3_Init("#version 130");
 
     Views active_view = Views::Science;
-    // ScienceView science_view;
+    ScienceView science_view;
 
     bool done = false;
     while (!done)
@@ -99,8 +99,7 @@ int main(int argc, char* argv[])
         switch (active_view)
         {
         case Views::Science:
-            ImGui::Text("Widok Science (w budowie)");
-            // science_view.Render();
+            science_view.Render();
             break;
         case Views::Navigation:
             ImGui::Text("Widok Navigation (w budowie)");
