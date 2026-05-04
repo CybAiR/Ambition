@@ -1,17 +1,20 @@
 #pragma once
+#include "Views.h"
 #include "imgui.h"
 #include <string>
-#include "Views.h"
 
 class SidePanel
 {
-public:
+  public:
     SidePanel(ImGuiWindowFlags side_panel_flags);
 
-    [[nodiscard]] float get_width() const { return width; }
+    [[nodiscard]] float get_width() const
+    {
+        return width;
+    }
     void render(const ImGuiViewport* viewport, Views& active_view);
 
-private:
+  private:
     float width = 250.0f;
     ImVec4 bg_color = ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
     ImVec4 border_color = ImVec4(0.2f, 0.2f, 0.2f, 1.0f);

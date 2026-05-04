@@ -1,7 +1,7 @@
 #include "SidePanel.h"
 #include "imgui.h"
-#include "imgui_impl_sdl2.h"
 #include "imgui_impl_opengl3.h"
+#include "imgui_impl_sdl2.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 #include <iostream>
@@ -46,12 +46,10 @@ void SidePanel::generate_side_buttons(const ImGuiViewport* viewport, Views& acti
         active_view = Views::Navigation;
     }
 
-
     if (ImGui::Button("Maintance", side_btn_size))
     {
         active_view = Views::Maintenance;
     }
-
 
     if (ImGui::Button("Probing", side_btn_size))
     {
@@ -60,7 +58,6 @@ void SidePanel::generate_side_buttons(const ImGuiViewport* viewport, Views& acti
 
     ImGui::PopStyleColor(4);
     ImGui::PopStyleVar(3);
-
 }
 
 void SidePanel::generate_link(const ImGuiViewport* viewport) const
@@ -79,7 +76,6 @@ void SidePanel::generate_link(const ImGuiViewport* viewport) const
 
     ImVec2 side_btn_size(this->width, this->side_btn_height);
 
-    
     ImGui::Button("Link OK", side_btn_size);
 
     ImGui::PopStyleVar(3);
@@ -88,26 +84,20 @@ void SidePanel::generate_link(const ImGuiViewport* viewport) const
 
 void SidePanel::render(const ImGuiViewport* viewport, Views& active_view)
 {
-    ImVec2 side_panel_pos(
-        viewport->WorkPos.x,
-        viewport->WorkPos.y
-    );
-    ImVec2 side_panel_size(
-        this->width, 
-        viewport->WorkSize.y
-    );
+    ImVec2 side_panel_pos(viewport->WorkPos.x, viewport->WorkPos.y);
+    ImVec2 side_panel_size(this->width, viewport->WorkSize.y);
 
     ImGui::SetNextWindowPos(side_panel_pos);
     ImGui::SetNextWindowSize(side_panel_size);
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-    
+
     ImGui::Begin("SidePanel", nullptr, side_panel_flags);
 
     generate_logo();
     generate_side_buttons(viewport, active_view);
     generate_link(viewport);
-    
+
     ImGui::PopStyleVar(1);
     ImGui::End();
 }
