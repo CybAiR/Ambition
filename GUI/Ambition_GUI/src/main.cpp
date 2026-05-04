@@ -9,6 +9,7 @@
 #include <SDL2/SDL_opengl.h>
 #include <iostream>
 
+#include "views/MaintenanceView.h"
 #include "views/ScienceView.h"
 
 int main(int argc, char* argv[])
@@ -44,6 +45,7 @@ int main(int argc, char* argv[])
 
     Views active_view = Views::Science;
     // ScienceView science_view;
+    MaintenanceView maintenance_view;
 
     bool done = false;
     while (!done)
@@ -107,8 +109,7 @@ int main(int argc, char* argv[])
             // navigation_view.Render();
             break;
         case Views::Maintenance:
-            ImGui::Text("Widok Maintenance (w budowie)");
-            // mnaintenance_view.Render();
+            maintenance_view.Render();
             break;
         case Views::Probing:
             ImGui::Text("Widok Probing (w budowie)");
