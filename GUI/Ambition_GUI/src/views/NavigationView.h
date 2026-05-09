@@ -75,7 +75,9 @@ class NavigationView : public View
     }
 
   private:
+    void RenderLeftColumn(const State& state, float width) const;
     void RenderRightColumn(State& state, float width);
+    void RenderMapContainer(float height) const;
     void RenderStatus(Status& status);
     void RenderEstimatedKinematics(const EstimatedKinematics& kinematics) const;
     void RenderWaypointEditor(WaypointEditor& editor);

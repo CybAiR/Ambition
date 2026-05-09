@@ -100,13 +100,28 @@ void NavigationView::Render(State& state)
     float left_width = avail.x - right_width - gap_x;
     left_width = Max(left_width, 1.0f);
 
-    ImGui::BeginChild("LeftColumnPlaceholder", ImVec2(left_width, 0.0f), false, kNoScrollFlags);
-    ImGui::EndChild();
+    RenderLeftColumn(state, left_width);
 
     ImGui::SameLine(0.0f, gap_x);
     RenderRightColumn(state, right_width);
 
     ImGui::PopID();
+}
+
+void NavigationView::RenderLeftColumn(const State& state, float width) const
+{
+    if (ImGui::BeginChild("LeftColumn", ImVec2(width, 0.0f), false, kNoScrollFlags))
+    {
+        const float gap_y = ImGui::GetStyle().ItemSpacing.y;
+        const ImVec2 avail = ImGui::GetContentRegionAvail();
+
+        float map_height = avail.y;
+        map_height = Max(map_height, 1.0f);
+
+        NavigationView::RenderMapContainer(map_height);
+    }
+
+    ImGui::EndChild();
 }
 
 void NavigationView::RenderRightColumn(State& state, float width)
@@ -128,6 +143,15 @@ void NavigationView::RenderRightColumn(State& state, float width)
     ImGui::EndChild();
     ImGui::PopStyleVar();
     ImGui::PopStyleColor();
+}
+
+void NavigationView::RenderMapContainer(float height) const
+{
+    if (ImGui::BeginChild("MapContainer", ImVec2(0.0f, height), true, kNoScrollFlags))
+    {
+    }
+
+    ImGui::EndChild();
 }
 
 void NavigationView::RenderStatus(Status& status)
