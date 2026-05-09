@@ -42,6 +42,7 @@ class MaintenanceView : public View
     }
 
   private:
+    void RenderLeftColumn(const State& state, float width) const;
     void RenderRightColumn(const State& state, float width) const;
     void RenderArmTelemetryCard(const ArmTelemetry& arm, const GripperTelemetry& gripper) const;
 

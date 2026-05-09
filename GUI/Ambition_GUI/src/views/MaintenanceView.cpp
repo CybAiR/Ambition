@@ -85,13 +85,28 @@ void MaintenanceView::Render(const State& state) const
     left_width = Max(left_width, 1.0f);
 
     // 4. Fixed the SameLine() crash by rendering an empty dummy column first
-    ImGui::BeginChild("LeftColumnPlaceholder", ImVec2(left_width, 0.0f), false, kNoScrollFlags);
-    ImGui::EndChild();
+    RenderLeftColumn(state, left_width);
 
     ImGui::SameLine(0.0f, gap_x);
     RenderRightColumn(state, right_width);
 
     ImGui::PopID();
+}
+
+void MaintenanceView::RenderLeftColumn(const State& state, float width) const
+{
+    if (ImGui::BeginChild("LeftColumn", ImVec2(width, 0.0f), false, kNoScrollFlags))
+    {
+        const float gap_y = ImGui::GetStyle().ItemSpacing.y;
+        const ImVec2 avail = ImGui::GetContentRegionAvail();
+
+        float camera_height = avail.y;
+        camera_height = Max(camera_height, 1.0f);
+
+        View::RenderCameraContainer(camera_height);
+    }
+
+    ImGui::EndChild();
 }
 
 void MaintenanceView::RenderRightColumn(const State& state, float width) const
