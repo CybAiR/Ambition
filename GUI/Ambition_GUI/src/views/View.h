@@ -70,7 +70,13 @@ protected:
         ImGuiWindowFlags_NoBackground;
 
     void InnerSeparator() const;
-    void RenderCameraContainer(float height, const char* title, bool is_screenshot_enabled) const;
+    bool RenderCameraContainer(
+        float height,
+        const char* title,
+        bool is_screenshot_enabled,
+        bool is_fullscreen_button_enabled,
+        bool is_fullscreen_active
+    ) const;
     void RenderGpsCard(const GpsOdometry& gps) const;
     bool BeginCard(const char* id, const ImVec2& size) const;
     void DrawHeader(const char* title, float text_y = 5.0f) const;

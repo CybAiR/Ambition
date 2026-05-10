@@ -74,41 +74,49 @@ ScienceView::Action ScienceView::Render()
     return Render(state_);
 }
 
-ScienceView::Action ScienceView::Render(const State& state) const
+ScienceView::Action ScienceView::Render(const State& state)
 {
     ImGui::PushID(this);
 
     const ImVec2 avail = ImGui::GetContentRegionAvail();
-    const float gap_x = ImGui::GetStyle().ItemSpacing.x;
+    Action action = Action::None;
 
-    float right_width = kRightPanelWidth;
-
-    if (avail.x < kMinLeftWidth + right_width + gap_x)
+    if (is_camera_fullscreen_)
     {
-        right_width = avail.x - kMinLeftWidth - gap_x;
+        action = RenderLeftColumn(state, avail.x);
     }
-
-    right_width = Clamp(right_width, kMinRightWidth, kRightPanelWidth);
-
-    if (avail.x < kMinLeftWidth + kMinRightWidth + gap_x)
+    else
     {
-        right_width = Max(avail.x * 0.35f, 1.0f);
+        const float gap_x = ImGui::GetStyle().ItemSpacing.x;
+        float right_width = kRightPanelWidth;
+
+        if (avail.x < kMinLeftWidth + right_width + gap_x)
+        {
+            right_width = avail.x - kMinLeftWidth - gap_x;
+        }
+
+        right_width = Clamp(right_width, kMinRightWidth, kRightPanelWidth);
+
+        if (avail.x < kMinLeftWidth + kMinRightWidth + gap_x)
+        {
+            right_width = Max(avail.x * 0.35f, 1.0f);
+        }
+
+        float left_width = avail.x - right_width - gap_x;
+        left_width = Max(left_width, 1.0f);
+
+        action = RenderLeftColumn(state, left_width);
+
+        ImGui::SameLine(0.0f, gap_x);
+        RenderRightColumn(state, right_width);
     }
-
-    float left_width = avail.x - right_width - gap_x;
-    left_width = Max(left_width, 1.0f);
-
-    const Action action = RenderLeftColumn(state, left_width);
-
-    ImGui::SameLine(0.0f, gap_x);
-    RenderRightColumn(state, right_width);
 
     ImGui::PopID();
 
     return action;
 }
 
-ScienceView::Action ScienceView::RenderLeftColumn(const State& state, float width) const
+ScienceView::Action ScienceView::RenderLeftColumn(const State& state, float width)
 {
     Action action = Action::None;
 
@@ -117,11 +125,27 @@ ScienceView::Action ScienceView::RenderLeftColumn(const State& state, float widt
         const float gap_y = ImGui::GetStyle().ItemSpacing.y;
         const ImVec2 avail = ImGui::GetContentRegionAvail();
 
-        float camera_height = avail.y - kBottomPanelHeight - gap_y;
+        const bool was_fullscreen = is_camera_fullscreen_;
+        float camera_height = was_fullscreen ? avail.y : (avail.y - kBottomPanelHeight - gap_y);
         camera_height = Max(camera_height, 1.0f);
 
-        RenderCameraContainer(camera_height, "MAIN CAMERA (SCIENCE)", true);
-        action = RenderBottomPanel(state);
+        const bool is_fullscreen_toggled = RenderCameraContainer(
+            camera_height,
+            "MAIN CAMERA (SCIENCE)",
+            true,
+            true,
+            was_fullscreen
+        );
+
+        if (is_fullscreen_toggled)
+        {
+            is_camera_fullscreen_ = !is_camera_fullscreen_;
+        }
+
+        if (!was_fullscreen && !is_fullscreen_toggled)
+        {
+            action = RenderBottomPanel(state);
+        }
     }
 
     ImGui::EndChild();
@@ -361,10 +385,10 @@ bool ScienceView::RenderSlotButton(const char* id, const char* label, bool is_fi
 
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
     const char* slot_icon = ICON_FA_VIAL;
-    const float icon_center_compensation_x = 3.0f;
+    constexpr float ICON_CENTER_COMPENSATION_X = 3.0f;
     const ImVec2 icon_size = ImGui::CalcTextSize(slot_icon);
     const float icon_x =
-        btn_min.x + (btn_max.x - btn_min.x - icon_size.x) * 0.5f + icon_center_compensation_x;
+        btn_min.x + (btn_max.x - btn_min.x - icon_size.x) * 0.5f + ICON_CENTER_COMPENSATION_X;
     const float icon_y = btn_min.y + (btn_max.y - btn_min.y - icon_size.y) * 0.5f;
     const ImVec4 icon_color = is_filled ? kSlotGreen : kMutedText;
     draw_list->AddText(ImVec2(icon_x, icon_y), ImGui::GetColorU32(icon_color), slot_icon);

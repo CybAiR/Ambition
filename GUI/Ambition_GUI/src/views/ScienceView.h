@@ -46,13 +46,13 @@ public:
 
 public:
     Action Render();
-    Action Render(const State& state) const;
+    Action Render(const State& state);
 
     State& Data() noexcept { return state_; }
     const State& Data() const noexcept { return state_; }
 
 private:
-    Action RenderLeftColumn(const State& state, float width) const;
+    Action RenderLeftColumn(const State& state, float width);
     Action RenderBottomPanel(const State& state) const;
 
     Action RenderContainersSection(const State& state, float width) const;
@@ -75,4 +75,5 @@ private:
 
 private:
     State state_;
+    bool is_camera_fullscreen_ = false;
 };
