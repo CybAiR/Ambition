@@ -133,7 +133,7 @@ void TopPanel::render(const ImGuiViewport* viewport) const
 
     ImGui::Begin("TopPanel", nullptr, this->top_panel_flags);
 
-
+    ImGui::SetWindowFontScale(this->font_scale);
 
     TopPanel::generate_view_text("Maintenance");
 

@@ -1,4 +1,5 @@
 #include "ScienceView.h"
+#include <../fonts/IconsFontAwesome6.h>
 
 #include <cstdarg>
 #include <imgui.h>
@@ -119,7 +120,7 @@ ScienceView::Action ScienceView::RenderLeftColumn(const State& state, float widt
         float camera_height = avail.y - kBottomPanelHeight - gap_y;
         camera_height = Max(camera_height, 1.0f);
 
-        RenderCameraContainer(camera_height);
+        RenderCameraContainer(camera_height, "MAIN CAMERA (SCIENCE)", true);
         action = RenderBottomPanel(state);
     }
 
@@ -352,9 +353,21 @@ bool ScienceView::RenderSlotButton(const char* id, const char* label, bool is_fi
     ImGui::PushStyleColor(ImGuiCol_Border, kSlotGreen);
 
     const bool clicked = ImGui::Button(id, ImVec2(kSlotButtonSize, kSlotButtonSize));
+    const ImVec2 btn_min = ImGui::GetItemRectMin();
+    const ImVec2 btn_max = ImGui::GetItemRectMax();
 
     ImGui::PopStyleColor(4);
     ImGui::PopStyleVar(2);
+
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    const char* slot_icon = ICON_FA_VIAL;
+    const float icon_center_compensation_x = 3.0f;
+    const ImVec2 icon_size = ImGui::CalcTextSize(slot_icon);
+    const float icon_x =
+        btn_min.x + (btn_max.x - btn_min.x - icon_size.x) * 0.5f + icon_center_compensation_x;
+    const float icon_y = btn_min.y + (btn_max.y - btn_min.y - icon_size.y) * 0.5f;
+    const ImVec4 icon_color = is_filled ? kSlotGreen : kMutedText;
+    draw_list->AddText(ImVec2(icon_x, icon_y), ImGui::GetColorU32(icon_color), slot_icon);
 
     const ImVec2 text_size = ImGui::CalcTextSize(label);
 
