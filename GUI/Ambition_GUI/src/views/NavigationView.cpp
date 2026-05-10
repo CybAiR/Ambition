@@ -1,5 +1,6 @@
 #include "NavigationView.h"
 
+#include <../fonts/IconsFontAwesome6.h>
 #include <algorithm>
 #include <cstdarg>
 #include <cstdio>
@@ -159,7 +160,7 @@ void NavigationView::renderStatus()
 
         ImGui::SetCursorPosX(ImGui::GetWindowWidth() * 0.5f - 60.0f);
 
-        ImGui::TextColored(current_text_border, "%s STATUS:", icon);
+        ImGui::TextColored(current_text_border, ICON_FA_HAND "%s STATUS:", icon);
         ImGui::SameLine();
         ImGui::TextColored(current_text_border, "%s", state_str);
 
