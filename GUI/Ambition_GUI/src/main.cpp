@@ -9,6 +9,7 @@
 #include <SDL2/SDL_opengl.h>
 #include <iostream>
 
+#include "fonts/IconsFontAwesome6.h"
 #include "views/ScienceView.h"
 
 int main(int argc, char* argv[])
@@ -21,6 +22,13 @@ int main(int argc, char* argv[])
     ImFont* main_font = io.Fonts->AddFontFromFileTTF("../misc/fonts/Roboto-Medium.ttf", 15.0f);
     ImFont* bold_font = io.Fonts->AddFontFromFileTTF("../misc/fonts/Roboto-Medium.ttf", 15.0f);
     ImFont* logo_font = io.Fonts->AddFontFromFileTTF("../misc/fonts/Roboto-Medium.ttf", 32.0f);
+
+    ImFontConfig icon_config;
+    icon_config.MergeMode = true;
+    icon_config.PixelSnapH = true;
+    static const ImWchar icon_ranges[] = {ICON_MIN_FA, ICON_MAX_FA, 0};
+    io.Fonts->AddFontFromFileTTF("../misc/fonts/fa-solid-900.otf", 15.0f, &icon_config,
+                                 icon_ranges);
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
@@ -43,7 +51,6 @@ int main(int argc, char* argv[])
     ImGui_ImplOpenGL3_Init("#version 130");
 
     Views active_view = Views::Science;
-    // ScienceView science_view;
 
     bool done = false;
     while (!done)
@@ -60,8 +67,6 @@ int main(int argc, char* argv[])
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
-        // UI code
-
         const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
         ImGuiWindowFlags side_panel_flags = ImGuiWindowFlags_NoTitleBar |
@@ -76,16 +81,12 @@ int main(int argc, char* argv[])
         ImGuiWindowFlags top_panel_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
                                            ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse;
 
-        // TOP PANEL
-        float size_x = viewport->WorkSize.x;
-        TopPanel top_panel(size_x, top_panel_flags);
+        TopPanel top_panel(viewport->WorkSize.x, top_panel_flags);
         top_panel.render(viewport);
 
-        // SIDE PANEL
         SidePanel side_panel(side_panel_flags);
         side_panel.render(viewport, active_view);
 
-        // VIEWS
         ImVec2 main_view_pos(viewport->WorkPos.x + side_panel.get_width(),
                              viewport->WorkPos.y + 75.0f);
         ImVec2 main_view_size(viewport->WorkSize.x - side_panel.get_width(),
@@ -100,19 +101,15 @@ int main(int argc, char* argv[])
         {
         case Views::Science:
             ImGui::Text("Widok Science (w budowie)");
-            // science_view.Render();
             break;
         case Views::Navigation:
             ImGui::Text("Widok Navigation (w budowie)");
-            // navigation_view.Render();
             break;
         case Views::Maintenance:
             ImGui::Text("Widok Maintenance (w budowie)");
-            // mnaintenance_view.Render();
             break;
         case Views::Probing:
             ImGui::Text("Widok Probing (w budowie)");
-            // probing_view.Render();
             break;
         }
 
@@ -126,7 +123,6 @@ int main(int argc, char* argv[])
         SDL_GL_SwapWindow(window);
     }
 
-    // Cleanup
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
