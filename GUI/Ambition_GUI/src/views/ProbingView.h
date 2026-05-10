@@ -1,53 +1,41 @@
 #pragma once
 
 #include "View.h"
-#include <array>
 
 class ProbingView : public View
 {
   public:
-    ProbingView(ImGuiWindowFlags flags = 0);
+    ProbingView(ImGuiWindowFlags flags = 0) : View(flags)
+    {
+    }
 
-    struct MissionProgress
+    struct missionProgress_S
     {
         int probes_collected = 3;
         int target = 5;
     };
 
-    struct State
+    struct state_S
     {
         ArmTelemetry arm;
         GripperTelemetry gripper;
-        MissionProgress mission;
+        missionProgress_S mission;
 
-        std::array<bool, 3> container_filled = {false, false, false};
+        bool container_filled[3] = {false, false, false};
     };
 
-  public:
-    void Render();
-    void Render(const State& state) const;
-
-    State& Data() noexcept
-    {
-        return state_;
-    }
-    const State& Data() const noexcept
-    {
-        return state_;
-    }
+    void render();
 
   private:
-    void RenderLeftColumn(const State& state, float width) const;
-    void RenderRightColumn(const State& state, float width) const;
-    void RenderArmTelemetryCard(const ArmTelemetry& arm, const GripperTelemetry& gripper) const;
+    void renderLeftColumn(float width) const;
+    void renderRightColumn(float width) const;
+    void renderArmTelemetryCard(const ArmTelemetry& arm, const GripperTelemetry& gripper) const;
+    void renderMissionProgressCard(const missionProgress_S& mission) const;
+    bool renderColoredButton(const char* label, const ImVec2& size, const ImVec4& base_color,
+                             const ImVec4& hover_color) const;
+    void innerSeparator() const;
 
-    // Add this declaration
-    void RenderMissionProgressCard(const MissionProgress& mission) const;
+    static const char* toString(GripperState state);
 
-    static const char* ToString(GripperState state) noexcept;
-
-    void InnerSeparator() const;
-
-  private:
-    State state_;
+    state_S state_;
 };

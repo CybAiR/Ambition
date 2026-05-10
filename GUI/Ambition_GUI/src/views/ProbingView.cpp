@@ -1,42 +1,35 @@
 #include "ProbingView.h"
 
+#include <algorithm>
 #include <cstdarg>
-#include <cstdio> // Added for snprintf
+#include <cstdio>
 #include <imgui.h>
 
 namespace
 {
-constexpr float kRightPanelWidth = 400.0f;
-constexpr float kMinLeftWidth = 240.0f;
-constexpr float kMinRightWidth = 180.0f;
+constexpr float K_RIGHT_PANEL_WIDTH = 400.0f;
+constexpr float K_MIN_LEFT_WIDTH = 240.0f;
+constexpr float K_MIN_RIGHT_WIDTH = 180.0f;
 
-constexpr float kOuterPadX = 10.0f;
-constexpr float kOuterPadY = 10.0f;
+constexpr float K_OUTER_PAD_X = 10.0f;
+constexpr float K_OUTER_PAD_Y = 10.0f;
 
-const ImVec4 kPanelBg = ImVec4(0.08f, 0.08f, 0.08f, 1.0f);
+const ImVec4 K_PANEL_BG = ImVec4(0.08f, 0.08f, 0.08f, 1.0f);
+const ImVec4 K_LOG_BASE = ImVec4(0.12f, 0.22f, 0.15f, 1.0f);
+const ImVec4 K_LOG_HOVER = ImVec4(0.18f, 0.28f, 0.20f, 1.0f);
+const ImVec4 K_LOG_TEXT = ImVec4(0.50f, 0.85f, 0.60f, 1.0f);
 
-float Max(float a, float b) noexcept
+const ImVec4 K_RESET_BASE = ImVec4(0.25f, 0.12f, 0.12f, 1.0f);
+const ImVec4 K_RESET_HOVER = ImVec4(0.35f, 0.18f, 0.18f, 1.0f);
+const ImVec4 K_RESET_TEXT = ImVec4(0.85f, 0.40f, 0.40f, 1.0f);
+} // namespace
+
+bool ProbingView::renderColoredButton(const char* label, const ImVec2& size,
+                                      const ImVec4& base_color, const ImVec4& hover_color) const
 {
-    return a > b ? a : b;
-}
-
-float Clamp(float value, float min_value, float max_value) noexcept
-{
-    if (value < min_value)
-        return min_value;
-
-    if (value > max_value)
-        return max_value;
-
-    return value;
-}
-
-// Helper added to colorize the custom buttons
-bool ColoredButton(const char* label, const ImVec2& size, const ImVec4& base, const ImVec4& hover)
-{
-    ImGui::PushStyleColor(ImGuiCol_Button, base);
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, hover);
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, base);
+    ImGui::PushStyleColor(ImGuiCol_Button, base_color);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, hover_color);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, base_color);
 
     const bool clicked = ImGui::Button(label, size);
 
@@ -44,13 +37,8 @@ bool ColoredButton(const char* label, const ImVec2& size, const ImVec4& base, co
 
     return clicked;
 }
-} // namespace
 
-ProbingView::ProbingView(ImGuiWindowFlags flags) : View(flags)
-{
-}
-
-void ProbingView::InnerSeparator() const
+void ProbingView::innerSeparator() const
 {
     ImGui::Dummy(ImVec2(0.0f, 6.0f));
 
@@ -66,45 +54,40 @@ void ProbingView::InnerSeparator() const
     ImGui::Dummy(ImVec2(0.0f, 10.0f));
 }
 
-void ProbingView::Render()
-{
-    Render(state_);
-}
-
-void ProbingView::Render(const State& state) const
+void ProbingView::render()
 {
     ImGui::PushID(this);
 
     const ImVec2 avail = ImGui::GetContentRegionAvail();
     const float gap_x = ImGui::GetStyle().ItemSpacing.x;
 
-    float right_width = kRightPanelWidth;
+    float right_width = K_RIGHT_PANEL_WIDTH;
 
-    if (avail.x < kMinLeftWidth + right_width + gap_x)
+    if (avail.x < K_MIN_LEFT_WIDTH + right_width + gap_x)
     {
-        right_width = avail.x - kMinLeftWidth - gap_x;
+        right_width = avail.x - K_MIN_LEFT_WIDTH - gap_x;
     }
 
-    right_width = Clamp(right_width, kMinRightWidth, kRightPanelWidth);
+    right_width = std::clamp(right_width, K_MIN_RIGHT_WIDTH, K_RIGHT_PANEL_WIDTH);
 
-    if (avail.x < kMinLeftWidth + kMinRightWidth + gap_x)
+    if (avail.x < K_MIN_LEFT_WIDTH + K_MIN_RIGHT_WIDTH + gap_x)
     {
-        right_width = Max(avail.x * 0.35f, 1.0f);
+        right_width = std::max(avail.x * 0.35f, 1.0f);
     }
 
     float left_width = avail.x - right_width - gap_x;
-    left_width = Max(left_width, 1.0f);
+    left_width = std::max(left_width, 1.0f);
 
-    RenderLeftColumn(state, left_width);
+    renderLeftColumn(left_width);
 
     ImGui::SameLine(0.0f, gap_x);
 
-    RenderRightColumn(state, right_width);
+    renderRightColumn(right_width);
 
     ImGui::PopID();
 }
 
-void ProbingView::RenderLeftColumn(const State& state, float width) const
+void ProbingView::renderLeftColumn(float width) const
 {
     if (ImGui::BeginChild("LeftColumn", ImVec2(width, 0.0f), false, kNoScrollFlags))
     {
@@ -112,7 +95,7 @@ void ProbingView::RenderLeftColumn(const State& state, float width) const
         const ImVec2 avail = ImGui::GetContentRegionAvail();
 
         float camera_height = avail.y;
-        camera_height = Max(camera_height, 1.0f);
+        camera_height = std::max(camera_height, 1.0f);
 
         View::RenderCameraContainer(camera_height);
     }
@@ -120,17 +103,17 @@ void ProbingView::RenderLeftColumn(const State& state, float width) const
     ImGui::EndChild();
 }
 
-void ProbingView::RenderRightColumn(const State& state, float width) const
+void ProbingView::renderRightColumn(float width) const
 {
-    ImGui::PushStyleColor(ImGuiCol_ChildBg, kPanelBg);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(kOuterPadX, kOuterPadY));
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, K_PANEL_BG);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(K_OUTER_PAD_X, K_OUTER_PAD_Y));
 
     if (ImGui::BeginChild("RightColumn", ImVec2(width, 0.0f), true, kNoScrollFlags))
     {
-        RenderMissionProgressCard(state.mission);
+        renderMissionProgressCard(state_.mission);
         ImGui::Dummy(ImVec2(0.0f, 8.0f));
 
-        RenderArmTelemetryCard(state.arm, state.gripper);
+        renderArmTelemetryCard(state_.arm, state_.gripper);
         ImGui::Dummy(ImVec2(0.0f, 8.0f));
     }
 
@@ -140,43 +123,43 @@ void ProbingView::RenderRightColumn(const State& state, float width) const
     ImGui::PopStyleColor();
 }
 
-void ProbingView::RenderArmTelemetryCard(const ArmTelemetry& arm,
+void ProbingView::renderArmTelemetryCard(const ArmTelemetry& arm,
                                          const GripperTelemetry& gripper) const
 {
     if (BeginCard("ArmCard", ImVec2(0.0f, 400.0f)))
     {
         DrawHeader("ARM TELEMETRY");
 
-        struct FloatRow
+        struct floatRow_S
         {
             const char* label;
             float value;
         };
 
-        const FloatRow joints[] = {{"BASE:", arm.base_deg},
-                                   {"SHOULDER:", arm.shoulder_deg},
-                                   {"ELBOW:", arm.elbow_deg},
-                                   {"WRIST PITCH:", arm.wrist_pitch_deg},
-                                   {"WRIST ROLL:", arm.wrist_roll_deg}};
+        const floatRow_S joints[] = {{"BASE:", arm.base_deg},
+                                     {"SHOULDER:", arm.shoulder_deg},
+                                     {"ELBOW:", arm.elbow_deg},
+                                     {"WRIST PITCH:", arm.wrist_pitch_deg},
+                                     {"WRIST ROLL:", arm.wrist_roll_deg}};
 
         ImGui::SetCursorPosX(kCardPadX);
         ImGui::TextColored(kMutedText, "JOINT ANGLES");
         ImGui::Dummy(ImVec2(0.0f, 4.0f));
 
-        for (const FloatRow& row : joints)
+        for (const floatRow_S& row : joints)
         {
             ValueRow(kLabelX, kValueX, kBlue, row.label, "%.0f°", row.value);
         }
 
         InnerSeparator();
 
-        const FloatRow position[] = {{"X:", arm.ee_x_m}, {"Y:", arm.ee_y_m}, {"Z:", arm.ee_z_m}};
+        const floatRow_S position[] = {{"X:", arm.ee_x_m}, {"Y:", arm.ee_y_m}, {"Z:", arm.ee_z_m}};
 
         ImGui::SetCursorPosX(kCardPadX);
         ImGui::TextColored(kMutedText, "END-EFFECTOR POSITION");
         ImGui::Dummy(ImVec2(0.0f, 4.0f));
 
-        for (const FloatRow& row : position)
+        for (const floatRow_S& row : position)
         {
             ValueRow(kLabelX, kValueX, kPurple, row.label, "%.2f m", row.value);
         }
@@ -187,7 +170,7 @@ void ProbingView::RenderArmTelemetryCard(const ArmTelemetry& arm,
         ImGui::TextColored(kMutedText, "GRIPPER STATE");
         ImGui::Dummy(ImVec2(0.0f, 4.0f));
 
-        ValueRow(kLabelX, kValueX, kGreen, "STATE:", "%s", ToString(gripper.state));
+        ValueRow(kLabelX, kValueX, kGreen, "STATE:", "%s", toString(gripper.state));
 
         ValueRow(kLabelX, kValueX, kOrange, "FORCE:", "%.0f N", gripper.force_n);
     }
@@ -195,85 +178,65 @@ void ProbingView::RenderArmTelemetryCard(const ArmTelemetry& arm,
     EndCard();
 }
 
-void ProbingView::RenderMissionProgressCard(const MissionProgress& mission) const
+void ProbingView::renderMissionProgressCard(const missionProgress_S& mission) const
 {
     if (BeginCard("MissionCard", ImVec2(0.0f, 160.0f)))
     {
         DrawHeader("MISSION PROGRESS");
 
-        ImGui::Dummy(ImVec2(0.0f, 4.0f)); // Top padding
+        ImGui::Dummy(ImVec2(0.0f, 4.0f));
 
         float avail_width = ImGui::GetContentRegionAvail().x - kCardPadX - 12.0f;
         ImGui::SetCursorPosX(kCardPadX);
 
-        // 1. The inner bordered box
         ImGui::PushStyleColor(ImGuiCol_Border, kBorder);
-        ImGui::PushStyleColor(ImGuiCol_ChildBg,
-                              ImVec4(0.0f, 0.0f, 0.0f, 0.0f)); // Transparent background
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
 
         if (ImGui::BeginChild("ProgressBox", ImVec2(avail_width, 60.0f), true,
                               ImGuiWindowFlags_NoScrollbar))
         {
 
-            // Left Text 1
             ImGui::SetCursorPos(ImVec2(10.0f, 10.0f));
             ImGui::TextColored(kMutedText, "PROBES COLLECTED");
 
-            // Left Text 2
             ImGui::SetCursorPos(ImVec2(10.0f, 35.0f));
             ImGui::TextColored(kGreen, "TARGET: %d", mission.target);
 
-            // Right Huge Text
             float old_scale = ImGui::GetFont()->Scale;
-            ImGui::SetWindowFontScale(3.0f); // Make font 3x larger for the number
+            ImGui::SetWindowFontScale(3.0f);
 
             char num_buf[16];
             snprintf(num_buf, sizeof(num_buf), "%d", mission.probes_collected);
             ImVec2 text_size = ImGui::CalcTextSize(num_buf);
 
-            // Right-align and center vertically
             float text_x = ImGui::GetWindowWidth() - text_size.x - 15.0f;
             float text_y = (ImGui::GetWindowHeight() - text_size.y) * 0.5f;
 
             ImGui::SetCursorPos(ImVec2(text_x, text_y));
             ImGui::TextColored(kGreen, "%s", num_buf);
 
-            ImGui::SetWindowFontScale(old_scale); // Always restore font scale!
+            ImGui::SetWindowFontScale(old_scale);
         }
         ImGui::EndChild();
         ImGui::PopStyleColor(2);
 
         ImGui::Dummy(ImVec2(0.0f, 8.0f));
 
-        // 2. The Buttons
         ImGui::SetCursorPosX(kCardPadX);
         float gap = ImGui::GetStyle().ItemSpacing.x;
         float btn_width = (avail_width - gap) * 0.5f;
 
-        // Colors carefully matched to your image
-        ImVec4 kLogBase = ImVec4(0.12f, 0.22f, 0.15f, 1.0f);
-        ImVec4 kLogHover = ImVec4(0.18f, 0.28f, 0.20f, 1.0f);
-        ImVec4 kLogText = ImVec4(0.50f, 0.85f, 0.60f, 1.0f);
-
-        ImVec4 kResetBase = ImVec4(0.25f, 0.12f, 0.12f, 1.0f);
-        ImVec4 kResetHover = ImVec4(0.35f, 0.18f, 0.18f, 1.0f);
-        ImVec4 kResetText = ImVec4(0.85f, 0.40f, 0.40f, 1.0f);
-
-        // Render Log Button (pushing custom text color first)
-        ImGui::PushStyleColor(ImGuiCol_Text, kLogText);
-        if (ColoredButton("+ LOG PROBE", ImVec2(btn_width, 32.0f), kLogBase, kLogHover))
+        ImGui::PushStyleColor(ImGuiCol_Text, K_LOG_TEXT);
+        if (renderColoredButton("+ LOG PROBE", ImVec2(btn_width, 32.0f), K_LOG_BASE, K_LOG_HOVER))
         {
-            // Action goes here
         }
         ImGui::PopStyleColor();
 
         ImGui::SameLine();
 
-        // Render Reset Button
-        ImGui::PushStyleColor(ImGuiCol_Text, kResetText);
-        if (ColoredButton("RESET", ImVec2(btn_width, 32.0f), kResetBase, kResetHover))
+        ImGui::PushStyleColor(ImGuiCol_Text, K_RESET_TEXT);
+        if (renderColoredButton("RESET", ImVec2(btn_width, 32.0f), K_RESET_BASE, K_RESET_HOVER))
         {
-            // Action goes here
         }
         ImGui::PopStyleColor();
     }
@@ -281,7 +244,7 @@ void ProbingView::RenderMissionProgressCard(const MissionProgress& mission) cons
     EndCard();
 }
 
-const char* ProbingView::ToString(GripperState state) noexcept
+const char* ProbingView::toString(GripperState state)
 {
     switch (state)
     {
