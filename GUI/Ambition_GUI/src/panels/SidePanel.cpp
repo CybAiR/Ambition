@@ -1,7 +1,6 @@
 #include "SidePanel.h"
 #include "imgui.h"
-#include "imgui_impl_opengl3.h"
-#include "imgui_impl_sdl2.h"
+#include <../fonts/IconsFontAwesome6.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 #include <iostream>
@@ -76,7 +75,7 @@ void SidePanel::generate_link(const ImGuiViewport* viewport) const
 
     ImVec2 side_btn_size(this->width, this->side_btn_height);
 
-    ImGui::Button("Link OK", side_btn_size);
+    ImGui::Button(ICON_FA_SIGNAL "LINK OK", side_btn_size);
 
     ImGui::PopStyleVar(3);
     ImGui::PopStyleColor(5);
