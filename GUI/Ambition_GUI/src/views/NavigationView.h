@@ -71,5 +71,5 @@ class NavigationView : public View
     static const char* toString(statusState_E state);
     static const char* toString(waypointState_E state);
 
-    state_S state;
+    state_S state_;
 };

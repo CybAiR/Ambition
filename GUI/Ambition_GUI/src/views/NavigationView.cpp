@@ -41,21 +41,21 @@ bool NavigationView::renderColoredButton(const char* label, const ImVec2& size,
     ImGui::PushStyleColor(ImGuiCol_Button, base_color);
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, hover_color);
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, base_color);
-    const bool clicked = ImGui::Button(label, size);
+    const bool is_clicked = ImGui::Button(label, size);
     ImGui::PopStyleColor(3);
-    return clicked;
+    return is_clicked;
 }
 
 void NavigationView::InnerSeparator() const
 {
     ImGui::Dummy(ImVec2(0.0f, 6.0f));
-    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    ImDrawList* pDraw_list = ImGui::GetWindowDrawList();
     const ImVec2 pos = ImGui::GetWindowPos();
     const ImVec2 size = ImGui::GetWindowSize();
     const float y = ImGui::GetCursorScreenPos().y;
 
-    draw_list->AddLine(ImVec2(pos.x + kCardPadX, y), ImVec2(pos.x + size.x - kCardPadX, y),
-                       ImGui::GetColorU32(kBorder));
+    pDraw_list->AddLine(ImVec2(pos.x + kCardPadX, y), ImVec2(pos.x + size.x - kCardPadX, y),
+                        ImGui::GetColorU32(kBorder));
     ImGui::Dummy(ImVec2(0.0f, 10.0f));
 }
 
@@ -136,11 +136,24 @@ void NavigationView::renderMapContainer(float height) const
 
 void NavigationView::renderStatus()
 {
-    bool is_auto = (state.status_type == statusState_E::AUTO);
+    bool is_auto = (state_.status_type == statusState_E::AUTO);
 
-    ImVec4 current_bg = is_auto ? K_THEME_DARK_BLUE : K_THEME_BROWN;
-    ImVec4 current_text_border = is_auto ? K_THEME_BLUE : K_THEME_ORANGE;
-    ImVec4 current_active_btn = is_auto ? K_THEME_INTENSE_BLUE : K_THEME_RED_ORANGE;
+    ImVec4 current_bg;
+    ImVec4 current_text_border;
+    ImVec4 current_active_btn;
+
+    if (is_auto)
+    {
+        current_bg = K_THEME_DARK_BLUE;
+        current_text_border = K_THEME_BLUE;
+        current_active_btn = K_THEME_INTENSE_BLUE;
+    }
+    else
+    {
+        current_bg = K_THEME_BROWN;
+        current_text_border = K_THEME_ORANGE;
+        current_active_btn = K_THEME_RED_ORANGE;
+    }
 
     ImGui::PushStyleColor(ImGuiCol_Border, current_text_border);
 
@@ -155,14 +168,13 @@ void NavigationView::renderStatus()
 
         ImGui::Dummy(ImVec2(0.0f, 8.0f));
 
-        const char* state_str = toString(state.status_type);
-        const char* icon = is_auto ? u8"" : u8"";
+        const char* pState_str = toString(state_.status_type);
 
         ImGui::SetCursorPosX(ImGui::GetWindowWidth() * 0.5f - 60.0f);
 
-        ImGui::TextColored(current_text_border, ICON_FA_HAND "%s STATUS:", icon);
+        ImGui::TextColored(current_text_border, ICON_FA_HAND "STATUS:");
         ImGui::SameLine();
-        ImGui::TextColored(current_text_border, "%s", state_str);
+        ImGui::TextColored(current_text_border, "%s", pState_str);
 
         ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
@@ -174,7 +186,7 @@ void NavigationView::renderStatus()
         ImVec4 auto_color = is_auto ? current_active_btn : K_BUTTON_BG;
         if (renderColoredButton("AUTO", ImVec2(btn_w, 35.0f), auto_color, auto_color))
         {
-            state.status_type = statusState_E::AUTO;
+            state_.status_type = statusState_E::AUTO;
         }
 
         ImGui::SameLine(0.0f, 0.0f);
@@ -182,7 +194,7 @@ void NavigationView::renderStatus()
         ImVec4 manual_color = (!is_auto) ? current_active_btn : K_BUTTON_BG;
         if (renderColoredButton("MANUAL", ImVec2(btn_w, 35.0f), manual_color, manual_color))
         {
-            state.status_type = statusState_E::MANUAL;
+            state_.status_type = statusState_E::MANUAL;
         }
 
         ImGui::PopStyleColor();
@@ -215,7 +227,7 @@ void NavigationView::renderEstimatedKinematics() const
             ImGui::SetWindowFontScale(2.0f);
 
             char val_buf[16];
-            snprintf(val_buf, sizeof(val_buf), "%.1f", state.kinematics.speed);
+            snprintf(val_buf, sizeof(val_buf), "%.1f", state_.kinematics.speed);
             ImVec2 val_size = ImGui::CalcTextSize(val_buf);
 
             ImGui::SetCursorPos(ImVec2((box_w - val_size.x) * 0.5f - 10.0f, 32.0f));
@@ -241,7 +253,7 @@ void NavigationView::renderEstimatedKinematics() const
             ImGui::SetWindowFontScale(2.0f);
 
             char head_buf[16];
-            snprintf(head_buf, sizeof(head_buf), "%d", state.kinematics.heading);
+            snprintf(head_buf, sizeof(head_buf), "%d", state_.kinematics.heading);
             ImVec2 head_size = ImGui::CalcTextSize(head_buf);
 
             ImGui::SetCursorPos(ImVec2((box_w - head_size.x) * 0.5f - 5.0f, 32.0f));
@@ -263,9 +275,9 @@ void NavigationView::renderEstimatedKinematics() const
         ImGui::TextColored(kTitleText, "GPS / ODOMETRY");
         ImGui::Dummy(ImVec2(0.0f, 6.0f));
 
-        ValueRow(kLabelX, kValueX, kGreen, "LAT:", "%.4f N", state.kinematics.gps.lat);
-        ValueRow(kLabelX, kValueX, kGreen, "LON:", "%.4f W", state.kinematics.gps.lon);
-        ValueRow(kLabelX, kValueX, kGreen, "ALT:", "%.1f m", state.kinematics.gps.alt_m);
+        ValueRow(kLabelX, kValueX, kGreen, "LAT:", "%.4f N", state_.kinematics.gps.lat);
+        ValueRow(kLabelX, kValueX, kGreen, "LON:", "%.4f W", state_.kinematics.gps.lon);
+        ValueRow(kLabelX, kValueX, kGreen, "ALT:", "%.1f m", state_.kinematics.gps.alt_m);
     }
     EndCard();
 }
@@ -290,7 +302,7 @@ void NavigationView::renderWaypointEditor()
 
         ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
-        for (const auto& pair : state.editor.waypoints)
+        for (const auto& pair : state_.editor.waypoints)
         {
             int id = pair.first;
             const waypoint_S& wp = pair.second;
@@ -315,8 +327,8 @@ void NavigationView::renderWaypointEditor()
 
                 ImGui::TextColored(K_THEME_LIGHT_BLUE, "X:%.1f Y:%.1f", wp.x, wp.y);
 
-                const char* state_str = toString(wp.state);
-                ImVec2 text_size = ImGui::CalcTextSize(state_str);
+                const char* pState_str = toString(wp.state);
+                ImVec2 text_size = ImGui::CalcTextSize(pState_str);
 
                 if (is_active)
                 {
@@ -330,13 +342,13 @@ void NavigationView::renderWaypointEditor()
                                screen_pos.y + text_size.y + 4.0f),
                         ImGui::GetColorU32(K_THEME_RED_ORANGE), 2.0f);
 
-                    ImGui::TextColored(K_THEME_ORANGE, "%s", state_str);
+                    ImGui::TextColored(K_THEME_ORANGE, "%s", pState_str);
                 }
                 else
                 {
                     ImGui::SetCursorPos(ImVec2(avail_w - text_size.x - 10.0f, 10.0f));
                     ImVec4 state_color = (wp.state == waypointState_E::DONE) ? kGreen : kMutedText;
-                    ImGui::TextColored(state_color, "%s", state_str);
+                    ImGui::TextColored(state_color, "%s", pState_str);
                 }
             }
             ImGui::EndChild();
