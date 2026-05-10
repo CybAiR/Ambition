@@ -112,7 +112,7 @@ int main(int argc, char* argv[])
             ImGui::Text("Widok Navigation (w budowie)");
             break;
         case Views::Maintenance:
-            maintenance_view.Render();
+            maintenance_view.render();
             break;
         case Views::Probing:
             ImGui::Text("Widok Probing (w budowie)");

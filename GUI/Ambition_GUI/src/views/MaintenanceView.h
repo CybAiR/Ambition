@@ -1,14 +1,15 @@
 #pragma once
 
 #include "View.h"
-#include <array>
 
 class MaintenanceView : public View
 {
   public:
-    MaintenanceView(ImGuiWindowFlags flags = 0);
+    MaintenanceView(ImGuiWindowFlags flags = 0) : View(flags)
+    {
+    }
 
-    struct JointDiagnostics
+    struct jointDiagnostics_S
     {
         float base_deg_cel = 45.0f;
         float shoulder_deg_cel = 68.0f;
@@ -19,40 +20,23 @@ class MaintenanceView : public View
         float elbow_current_a = 2.1f;
     };
 
-    struct State
+    struct state_S
     {
         ArmTelemetry arm;
         GripperTelemetry gripper;
-        JointDiagnostics joints;
-
-        std::array<bool, 3> container_filled = {false, false, false};
+        jointDiagnostics_S joints;
     };
 
-  public:
-    void Render();
-    void Render(const State& state) const;
-
-    State& Data() noexcept
-    {
-        return state_;
-    }
-    const State& Data() const noexcept
-    {
-        return state_;
-    }
+    void render();
 
   private:
-    void RenderLeftColumn(const State& state, float width) const;
-    void RenderRightColumn(const State& state, float width) const;
-    void RenderArmTelemetryCard(const ArmTelemetry& arm, const GripperTelemetry& gripper) const;
+    void renderLeftColumn(float width) const;
+    void renderRightColumn(float width) const;
+    void renderArmTelemetryCard(const ArmTelemetry& arm, const GripperTelemetry& gripper) const;
+    void renderJointDiagnostics(const jointDiagnostics_S& joints) const;
+    void innerSeparator() const;
 
-    // Add this declaration
-    void RenderJointDiagnostics(const JointDiagnostics& joints) const;
+    static const char* toString(GripperState state);
 
-    static const char* ToString(GripperState state) noexcept;
-
-    void InnerSeparator() const;
-
-  private:
-    State state_;
+    state_S state_;
 };
