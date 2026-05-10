@@ -1,92 +1,75 @@
 #pragma once
 
 #include "View.h"
-#include <array>
 #include <map>
 
 class NavigationView : public View
 {
   public:
-    NavigationView(ImGuiWindowFlags flags = 0);
-
-    enum class StatusState
+    enum class statusState_E
     {
         AUTO,
         MANUAL
     };
-
-    enum class WaypointState
+    enum class waypointState_E
     {
         DONE,
         ACTIVE,
         PENDING
     };
 
-    struct Status
-    {
-        StatusState type = StatusState::MANUAL;
-    };
-
-    struct EstimatedKinematics
+    struct estimatedKinematics_S
     {
         float speed = 1.2f;
         int heading = 45;
         GpsOdometry gps = {51.4883f, -0.1171f, 12.4f};
     };
 
-    struct Waypoint
+    struct waypoint_S
     {
         int id;
-        float x;
-        float y;
-        WaypointState state;
+        float x, y;
+        waypointState_E state;
     };
 
-    struct WaypointEditor
+    struct waypointEditor_S
     {
         float input_x = 0.0f;
         float input_y = 0.0f;
-        std::map<int, Waypoint> waypoints = {{1, {1, 12.4f, -4.2f, WaypointState::DONE}},
-                                             {2, {2, 25.1f, 0.8f, WaypointState::ACTIVE}},
-                                             {3, {3, 40.5f, 12.3f, WaypointState::PENDING}},
-                                             {4, {4, 55.0f, 20.1f, WaypointState::PENDING}}};
+        std::map<int, waypoint_S> waypoints = {
+            {1, {1, 12.4f, -4.2f, waypointState_E::DONE}},
+            {2, {2, 25.1f, 0.8f, waypointState_E::ACTIVE}},
+            {3, {3, 40.5f, 12.3f, waypointState_E::PENDING}},
+            {4, {4, 55.0f, 20.1f, waypointState_E::PENDING}},
+        };
     };
 
-    struct State
+    struct state_S
     {
-        Status status;
-        EstimatedKinematics kinematics;
-        WaypointEditor editor;
-
-        std::array<bool, 2> container_filled = {false, false};
+        statusState_E status_type = statusState_E::MANUAL;
+        estimatedKinematics_S kinematics;
+        waypointEditor_S editor;
     };
 
-  public:
-    void Render();
-    void Render(State& state);
+    NavigationView(ImGuiWindowFlags flags = 0) : View(flags)
+    {
+    }
 
-    State& Data() noexcept
-    {
-        return state_;
-    }
-    const State& Data() const noexcept
-    {
-        return state_;
-    }
+    void render();
 
   private:
-    void RenderLeftColumn(const State& state, float width) const;
-    void RenderRightColumn(State& state, float width);
-    void RenderMapContainer(float height) const;
-    void RenderStatus(Status& status);
-    void RenderEstimatedKinematics(const EstimatedKinematics& kinematics) const;
-    void RenderWaypointEditor(WaypointEditor& editor);
-
+    void renderLeftColumn(float width) const;
+    void renderRightColumn(float width);
+    void renderMapContainer(float height) const;
+    void renderStatus();
+    void renderEstimatedKinematics() const;
+    void renderWaypointEditor();
     void InnerSeparator() const;
+    bool renderColoredButton(const char* label, const ImVec2& size, const ImVec4& base_color,
+                             const ImVec4& hover_color);
 
-    static const char* ToString(StatusState state) noexcept;
-    static const char* ToString(WaypointState state) noexcept;
+    static const char* toString(statusState_E state);
+    static const char* toString(waypointState_E state);
 
-  private:
-    State state_;
+    state_S state;
 };

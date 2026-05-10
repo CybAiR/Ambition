@@ -1,5 +1,3 @@
-#include <filesystem>
-
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_sdl2.h"
@@ -7,7 +5,6 @@
 #include "panels/TopPanel.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
-#include <iostream>
 
 #include "views/NavigationView.h"
 #include "views/ScienceView.h"
@@ -105,7 +102,7 @@ int main(int argc, char* argv[])
             // science_view.Render();
             break;
         case Views::Navigation:
-            navigation_view.Render();
+            navigation_view.render();
             break;
         case Views::Maintenance:
             ImGui::Text("Widok Maintenance (w budowie)");

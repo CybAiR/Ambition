@@ -1,64 +1,48 @@
 #include "NavigationView.h"
 
+#include <algorithm>
 #include <cstdarg>
 #include <cstdio>
 #include <imgui.h>
 
 namespace
 {
-constexpr float kRightPanelWidth = 400.0f;
-constexpr float kMinLeftWidth = 240.0f;
-constexpr float kMinRightWidth = 180.0f;
+constexpr float K_RIGHT_PANEL_WIDTH = 400.0f;
+constexpr float K_MIN_LEFT_WIDTH = 240.0f;
+constexpr float K_MIN_RIGHT_WIDTH = 180.0f;
 
-constexpr float kOuterPadX = 10.0f;
-constexpr float kOuterPadY = 10.0f;
+constexpr float K_OUTER_PAD_X = 10.0f;
+constexpr float K_OUTER_PAD_Y = 10.0f;
 
-// --- MANUAL / ORANGE THEME ---
-const ImVec4 kThemeBrown = ImVec4(0.227f, 0.114f, 0.063f, 1.0f);
-const ImVec4 kThemeOrange = ImVec4(1.000f, 0.678f, 0.420f, 1.0f);
-const ImVec4 kThemeRedOrange = ImVec4(0.929f, 0.294f, 0.114f, 1.0f);
+// Status - Manual
+const ImVec4 K_THEME_BROWN = ImVec4(0.227f, 0.114f, 0.063f, 1.0f);
+const ImVec4 K_THEME_ORANGE = ImVec4(1.000f, 0.678f, 0.420f, 1.0f);
+const ImVec4 K_THEME_RED_ORANGE = ImVec4(0.929f, 0.294f, 0.114f, 1.0f);
 
-// --- AUTO / BLUE THEME ---
-const ImVec4 kThemeDarkBlue = ImVec4(0.063f, 0.114f, 0.227f, 1.0f);
-const ImVec4 kThemeBlue = ImVec4(0.420f, 0.678f, 1.000f, 1.0f);
-const ImVec4 kThemeIntenseBlue = ImVec4(0.220f, 0.380f, 0.839f, 1.0f);
+// Status - Auto
+const ImVec4 K_THEME_DARK_BLUE = ImVec4(0.063f, 0.114f, 0.227f, 1.0f);
+const ImVec4 K_THEME_BLUE = ImVec4(0.420f, 0.678f, 1.000f, 1.0f);
+const ImVec4 K_THEME_INTENSE_BLUE = ImVec4(0.220f, 0.380f, 0.839f, 1.0f);
 
-// --- GLOBAL COLORS ---
-const ImVec4 kThemeCyan = ImVec4(0.267f, 0.816f, 0.910f, 1.0f);
-const ImVec4 kThemeLightBlue = ImVec4(0.631f, 0.749f, 0.929f, 1.0f);
-const ImVec4 kDarkestBg = ImVec4(0.067f, 0.067f, 0.067f, 1.0f);
+const ImVec4 K_THEME_CYAN = ImVec4(0.267f, 0.816f, 0.910f, 1.0f);
+const ImVec4 K_THEME_LIGHT_BLUE = ImVec4(0.631f, 0.749f, 0.929f, 1.0f);
+const ImVec4 K_DARKEST_BG = ImVec4(0.067f, 0.067f, 0.067f, 1.0f);
 
-const ImVec4 kYellow = ImVec4(0.95f, 0.85f, 0.15f, 1.0f);
-const ImVec4 kButtonBg = ImVec4(0.20f, 0.20f, 0.20f, 1.0f);
-const ImVec4 kButtonHover = ImVec4(0.30f, 0.30f, 0.30f, 1.0f);
-const ImVec4 kPanelBg = ImVec4(0.08f, 0.08f, 0.08f, 1.0f);
+const ImVec4 K_YELLOW = ImVec4(0.95f, 0.85f, 0.15f, 1.0f);
+const ImVec4 K_BUTTON_BG = ImVec4(0.20f, 0.20f, 0.20f, 1.0f);
+const ImVec4 K_BUTTON_HOVER = ImVec4(0.30f, 0.30f, 0.30f, 1.0f);
+const ImVec4 K_PANEL_BG = ImVec4(0.08f, 0.08f, 0.08f, 1.0f);
+} // namespace
 
-float Max(float a, float b) noexcept
+bool NavigationView::renderColoredButton(const char* label, const ImVec2& size,
+                                         const ImVec4& base_color, const ImVec4& hover_color)
 {
-    return a > b ? a : b;
-}
-float Clamp(float value, float min_value, float max_value) noexcept
-{
-    if (value < min_value)
-        return min_value;
-    if (value > max_value)
-        return max_value;
-    return value;
-}
-
-bool ColoredButton(const char* label, const ImVec2& size, const ImVec4& base, const ImVec4& hover)
-{
-    ImGui::PushStyleColor(ImGuiCol_Button, base);
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, hover);
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, base);
+    ImGui::PushStyleColor(ImGuiCol_Button, base_color);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, hover_color);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, base_color);
     const bool clicked = ImGui::Button(label, size);
     ImGui::PopStyleColor(3);
     return clicked;
-}
-} // namespace
-
-NavigationView::NavigationView(ImGuiWindowFlags flags) : View(flags)
-{
 }
 
 void NavigationView::InnerSeparator() const
@@ -74,41 +58,36 @@ void NavigationView::InnerSeparator() const
     ImGui::Dummy(ImVec2(0.0f, 10.0f));
 }
 
-void NavigationView::Render()
-{
-    Render(state_);
-}
-
-void NavigationView::Render(State& state)
+void NavigationView::render()
 {
     ImGui::PushID(this);
 
     const ImVec2 avail = ImGui::GetContentRegionAvail();
     const float gap_x = ImGui::GetStyle().ItemSpacing.x;
 
-    float right_width = kRightPanelWidth;
-    if (avail.x < kMinLeftWidth + right_width + gap_x)
+    float right_width = K_RIGHT_PANEL_WIDTH;
+    if (avail.x < K_MIN_LEFT_WIDTH + right_width + gap_x)
     {
-        right_width = avail.x - kMinLeftWidth - gap_x;
+        right_width = avail.x - K_MIN_LEFT_WIDTH - gap_x;
     }
-    right_width = Clamp(right_width, kMinRightWidth, kRightPanelWidth);
-    if (avail.x < kMinLeftWidth + kMinRightWidth + gap_x)
+    right_width = std::clamp(right_width, K_MIN_RIGHT_WIDTH, K_RIGHT_PANEL_WIDTH);
+    if (avail.x < K_MIN_LEFT_WIDTH + K_MIN_RIGHT_WIDTH + gap_x)
     {
-        right_width = Max(avail.x * 0.35f, 1.0f);
+        std::max(avail.x * 0.35f, 1.0f);
     }
 
     float left_width = avail.x - right_width - gap_x;
-    left_width = Max(left_width, 1.0f);
+    left_width = std::max(left_width, 1.0f);
 
-    RenderLeftColumn(state, left_width);
+    renderLeftColumn(left_width);
 
     ImGui::SameLine(0.0f, gap_x);
-    RenderRightColumn(state, right_width);
+    renderRightColumn(right_width);
 
     ImGui::PopID();
 }
 
-void NavigationView::RenderLeftColumn(const State& state, float width) const
+void NavigationView::renderLeftColumn(float width) const
 {
     if (ImGui::BeginChild("LeftColumn", ImVec2(width, 0.0f), false, kNoScrollFlags))
     {
@@ -116,28 +95,28 @@ void NavigationView::RenderLeftColumn(const State& state, float width) const
         const ImVec2 avail = ImGui::GetContentRegionAvail();
 
         float map_height = avail.y;
-        map_height = Max(map_height, 1.0f);
+        map_height = std::max(map_height, 1.0f);
 
-        NavigationView::RenderMapContainer(map_height);
+        NavigationView::renderMapContainer(map_height);
     }
 
     ImGui::EndChild();
 }
 
-void NavigationView::RenderRightColumn(State& state, float width)
+void NavigationView::renderRightColumn(float width)
 {
-    ImGui::PushStyleColor(ImGuiCol_ChildBg, kPanelBg);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(kOuterPadX, kOuterPadY));
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, K_PANEL_BG);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(K_OUTER_PAD_X, K_OUTER_PAD_Y));
 
     if (ImGui::BeginChild("RightColumn", ImVec2(width, 0.0f), true, kNoScrollFlags))
     {
-        RenderStatus(state.status);
+        renderStatus();
         ImGui::Dummy(ImVec2(0.0f, 8.0f));
 
-        RenderEstimatedKinematics(state.kinematics);
+        renderEstimatedKinematics();
         ImGui::Dummy(ImVec2(0.0f, 8.0f));
 
-        RenderWaypointEditor(state.editor);
+        renderWaypointEditor();
     }
 
     ImGui::EndChild();
@@ -145,7 +124,7 @@ void NavigationView::RenderRightColumn(State& state, float width)
     ImGui::PopStyleColor();
 }
 
-void NavigationView::RenderMapContainer(float height) const
+void NavigationView::renderMapContainer(float height) const
 {
     if (ImGui::BeginChild("MapContainer", ImVec2(0.0f, height), true, kNoScrollFlags))
     {
@@ -154,13 +133,13 @@ void NavigationView::RenderMapContainer(float height) const
     ImGui::EndChild();
 }
 
-void NavigationView::RenderStatus(Status& status)
+void NavigationView::renderStatus()
 {
-    bool is_auto = (status.type == StatusState::AUTO);
+    bool is_auto = (state.status_type == statusState_E::AUTO);
 
-    ImVec4 current_bg = is_auto ? kThemeDarkBlue : kThemeBrown;
-    ImVec4 current_text_border = is_auto ? kThemeBlue : kThemeOrange;
-    ImVec4 current_active_btn = is_auto ? kThemeIntenseBlue : kThemeRedOrange;
+    ImVec4 current_bg = is_auto ? K_THEME_DARK_BLUE : K_THEME_BROWN;
+    ImVec4 current_text_border = is_auto ? K_THEME_BLUE : K_THEME_ORANGE;
+    ImVec4 current_active_btn = is_auto ? K_THEME_INTENSE_BLUE : K_THEME_RED_ORANGE;
 
     ImGui::PushStyleColor(ImGuiCol_Border, current_text_border);
 
@@ -175,7 +154,7 @@ void NavigationView::RenderStatus(Status& status)
 
         ImGui::Dummy(ImVec2(0.0f, 8.0f));
 
-        const char* state_str = ToString(status.type);
+        const char* state_str = toString(state.status_type);
         const char* icon = is_auto ? u8"" : u8"";
 
         ImGui::SetCursorPosX(ImGui::GetWindowWidth() * 0.5f - 60.0f);
@@ -191,18 +170,18 @@ void NavigationView::RenderStatus(Status& status)
 
         ImGui::PushStyleColor(ImGuiCol_Text, current_text_border);
 
-        ImVec4 auto_color = is_auto ? current_active_btn : kButtonBg;
-        if (ColoredButton("AUTO", ImVec2(btn_w, 35.0f), auto_color, auto_color))
+        ImVec4 auto_color = is_auto ? current_active_btn : K_BUTTON_BG;
+        if (renderColoredButton("AUTO", ImVec2(btn_w, 35.0f), auto_color, auto_color))
         {
-            status.type = StatusState::AUTO;
+            state.status_type = statusState_E::AUTO;
         }
 
         ImGui::SameLine(0.0f, 0.0f);
 
-        ImVec4 manual_color = (!is_auto) ? current_active_btn : kButtonBg;
-        if (ColoredButton("MANUAL", ImVec2(btn_w, 35.0f), manual_color, manual_color))
+        ImVec4 manual_color = (!is_auto) ? current_active_btn : K_BUTTON_BG;
+        if (renderColoredButton("MANUAL", ImVec2(btn_w, 35.0f), manual_color, manual_color))
         {
-            status.type = StatusState::MANUAL;
+            state.status_type = statusState_E::MANUAL;
         }
 
         ImGui::PopStyleColor();
@@ -211,7 +190,7 @@ void NavigationView::RenderStatus(Status& status)
     ImGui::PopStyleColor();
 }
 
-void NavigationView::RenderEstimatedKinematics(const EstimatedKinematics& kinematics) const
+void NavigationView::renderEstimatedKinematics() const
 {
     if (BeginCard("KinematicsCard", ImVec2(0.0f, 240.0f)))
     {
@@ -223,7 +202,7 @@ void NavigationView::RenderEstimatedKinematics(const EstimatedKinematics& kinema
 
         ImGui::SetCursorPosX(kCardPadX);
 
-        ImGui::PushStyleColor(ImGuiCol_ChildBg, kDarkestBg);
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, K_DARKEST_BG);
 
         if (ImGui::BeginChild("SpeedBox", ImVec2(box_w, 75.0f), true, kNoScrollFlags))
         {
@@ -235,17 +214,17 @@ void NavigationView::RenderEstimatedKinematics(const EstimatedKinematics& kinema
             ImGui::SetWindowFontScale(2.0f);
 
             char val_buf[16];
-            snprintf(val_buf, sizeof(val_buf), "%.1f", kinematics.speed);
+            snprintf(val_buf, sizeof(val_buf), "%.1f", state.kinematics.speed);
             ImVec2 val_size = ImGui::CalcTextSize(val_buf);
 
             ImGui::SetCursorPos(ImVec2((box_w - val_size.x) * 0.5f - 10.0f, 32.0f));
-            ImGui::TextColored(kYellow, "%s", val_buf);
+            ImGui::TextColored(K_YELLOW, "%s", val_buf);
 
             ImGui::SetWindowFontScale(old_scale);
 
             ImGui::SameLine(0.0f, 2.0f);
             ImGui::SetCursorPosY(44.0f);
-            ImGui::TextColored(kYellow, "m/s");
+            ImGui::TextColored(K_YELLOW, "m/s");
         }
         ImGui::EndChild();
 
@@ -261,7 +240,7 @@ void NavigationView::RenderEstimatedKinematics(const EstimatedKinematics& kinema
             ImGui::SetWindowFontScale(2.0f);
 
             char head_buf[16];
-            snprintf(head_buf, sizeof(head_buf), "%d", kinematics.heading);
+            snprintf(head_buf, sizeof(head_buf), "%d", state.kinematics.heading);
             ImVec2 head_size = ImGui::CalcTextSize(head_buf);
 
             ImGui::SetCursorPos(ImVec2((box_w - head_size.x) * 0.5f - 5.0f, 32.0f));
@@ -272,7 +251,7 @@ void NavigationView::RenderEstimatedKinematics(const EstimatedKinematics& kinema
             ImGui::SameLine(0.0f, 2.0f);
             ImGui::SetCursorPosY(36.0f);
 
-            ImGui::TextColored(kThemeCyan, u8"°");
+            ImGui::TextColored(K_THEME_CYAN, u8"°");
         }
         ImGui::EndChild();
         ImGui::PopStyleColor();
@@ -283,14 +262,14 @@ void NavigationView::RenderEstimatedKinematics(const EstimatedKinematics& kinema
         ImGui::TextColored(kTitleText, "GPS / ODOMETRY");
         ImGui::Dummy(ImVec2(0.0f, 6.0f));
 
-        ValueRow(kLabelX, kValueX, kGreen, "LAT:", "%.4f N", kinematics.gps.lat);
-        ValueRow(kLabelX, kValueX, kGreen, "LON:", "%.4f W", kinematics.gps.lon);
-        ValueRow(kLabelX, kValueX, kGreen, "ALT:", "%.1f m", kinematics.gps.alt_m);
+        ValueRow(kLabelX, kValueX, kGreen, "LAT:", "%.4f N", state.kinematics.gps.lat);
+        ValueRow(kLabelX, kValueX, kGreen, "LON:", "%.4f W", state.kinematics.gps.lon);
+        ValueRow(kLabelX, kValueX, kGreen, "ALT:", "%.1f m", state.kinematics.gps.alt_m);
     }
     EndCard();
 }
 
-void NavigationView::RenderWaypointEditor(WaypointEditor& editor)
+void NavigationView::renderWaypointEditor()
 {
     if (BeginCard("WaypointCard", ImVec2(0.0f, 0.0f)))
     {
@@ -302,25 +281,25 @@ void NavigationView::RenderWaypointEditor(WaypointEditor& editor)
 
         ImGui::SetCursorPosX(kCardPadX);
 
-        ColoredButton("ADD", ImVec2(btn_w, 35.0f), kButtonBg, kButtonHover);
+        renderColoredButton("ADD", ImVec2(btn_w, 35.0f), K_BUTTON_BG, K_BUTTON_HOVER);
         ImGui::SameLine(0.0f, 10.0f);
-        ColoredButton(u8"CLR", ImVec2(btn_w, 35.0f), kButtonBg, kButtonHover);
+        renderColoredButton(u8"CLR", ImVec2(btn_w, 35.0f), K_BUTTON_BG, K_BUTTON_HOVER);
         ImGui::SameLine(0.0f, 10.0f);
-        ColoredButton(u8"SYNC", ImVec2(btn_w, 35.0f), kButtonBg, kButtonHover);
+        renderColoredButton(u8"SYNC", ImVec2(btn_w, 35.0f), K_BUTTON_BG, K_BUTTON_HOVER);
 
         ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
-        for (const auto& pair : editor.waypoints)
+        for (const auto& pair : state.editor.waypoints)
         {
             int id = pair.first;
-            const Waypoint& wp = pair.second;
+            const waypoint_S& wp = pair.second;
 
-            bool is_active = (wp.state == WaypointState::ACTIVE);
+            bool is_active = (wp.state == waypointState_E::ACTIVE);
 
             ImGui::PushStyleColor(ImGuiCol_ChildBg,
-                                  is_active ? kThemeBrown : ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+                                  is_active ? K_THEME_BROWN : ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
             ImGui::PushStyleColor(ImGuiCol_Border,
-                                  is_active ? kThemeOrange : ImVec4(0.25f, 0.25f, 0.25f, 1.0f));
+                                  is_active ? K_THEME_ORANGE : ImVec4(0.25f, 0.25f, 0.25f, 1.0f));
 
             ImGui::SetCursorPosX(kCardPadX);
             ImGui::PushID(id);
@@ -330,17 +309,16 @@ void NavigationView::RenderWaypointEditor(WaypointEditor& editor)
 
                 ImGui::SetCursorPos(ImVec2(10.0f, 10.0f));
 
-                ImGui::TextColored(is_active ? kThemeOrange : kMutedText, "#%d ", id);
+                ImGui::TextColored(is_active ? K_THEME_ORANGE : kMutedText, "#%d ", id);
                 ImGui::SameLine(0.0f, 0.0f);
 
-                ImGui::TextColored(kThemeLightBlue, "X:%.1f Y:%.1f", wp.x, wp.y);
+                ImGui::TextColored(K_THEME_LIGHT_BLUE, "X:%.1f Y:%.1f", wp.x, wp.y);
 
-                const char* state_str = ToString(wp.state);
+                const char* state_str = toString(wp.state);
                 ImVec2 text_size = ImGui::CalcTextSize(state_str);
 
                 if (is_active)
                 {
-                    // --- CHANGED HERE: Lowered further to 11.0f ---
                     ImVec2 cur_pos = ImVec2(avail_w - text_size.x - 16.0f, 10.5f);
                     ImGui::SetCursorPos(cur_pos);
                     ImVec2 screen_pos = ImGui::GetCursorScreenPos();
@@ -349,14 +327,14 @@ void NavigationView::RenderWaypointEditor(WaypointEditor& editor)
                         ImVec2(screen_pos.x - 6.0f, screen_pos.y - 4.0f),
                         ImVec2(screen_pos.x + text_size.x + 6.0f,
                                screen_pos.y + text_size.y + 4.0f),
-                        ImGui::GetColorU32(kThemeRedOrange), 2.0f);
+                        ImGui::GetColorU32(K_THEME_RED_ORANGE), 2.0f);
 
-                    ImGui::TextColored(kThemeOrange, "%s", state_str);
+                    ImGui::TextColored(K_THEME_ORANGE, "%s", state_str);
                 }
                 else
                 {
                     ImGui::SetCursorPos(ImVec2(avail_w - text_size.x - 10.0f, 10.0f));
-                    ImVec4 state_color = (wp.state == WaypointState::DONE) ? kGreen : kMutedText;
+                    ImVec4 state_color = (wp.state == waypointState_E::DONE) ? kGreen : kMutedText;
                     ImGui::TextColored(state_color, "%s", state_str);
                 }
             }
@@ -371,16 +349,18 @@ void NavigationView::RenderWaypointEditor(WaypointEditor& editor)
     EndCard();
 }
 
-const char* NavigationView::ToString(StatusState state) noexcept
+const char* NavigationView::toString(statusState_E state)
 {
-    return state == StatusState::AUTO ? "AUTO" : "MANUAL";
+    if (state == statusState_E::AUTO)
+        return "AUTO";
+    return "MANUAL";
 }
 
-const char* NavigationView::ToString(WaypointState state) noexcept
+const char* NavigationView::toString(waypointState_E state)
 {
-    if (state == WaypointState::DONE)
+    if (state == waypointState_E::DONE)
         return "DONE";
-    if (state == WaypointState::ACTIVE)
+    if (state == waypointState_E::ACTIVE)
         return "ACTIVE";
     return "PENDING";
 }
