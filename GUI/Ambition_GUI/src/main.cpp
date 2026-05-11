@@ -25,9 +25,9 @@ int main(int argc, char* argv[])
     icon_config.MergeMode = true;
     icon_config.PixelSnapH = true;
     icon_config.GlyphOffset = ImVec2(-3.0f, 1.0f);
-    static const ImWchar icon_ranges[] = {ICON_MIN_FA, ICON_MAX_FA, 0};
+    static const ImWchar sIcon_ranges[] = {ICON_MIN_FA, ICON_MAX_FA, 0};
     io.Fonts->AddFontFromFileTTF("../misc/fonts/fa-solid-900.otf", 15.0f, &icon_config,
-                                 icon_ranges);
+                                 sIcon_ranges);
 
     ImFont* bold_font = io.Fonts->AddFontFromFileTTF("../misc/fonts/Roboto-Medium.ttf", 15.0f);
     ImFont* logo_font = io.Fonts->AddFontFromFileTTF("../misc/fonts/Roboto-Medium.ttf", 32.0f);
@@ -93,9 +93,9 @@ int main(int argc, char* argv[])
         SidePanel side_panel(side_panel_flags);
         side_panel.render(viewport, active_view);
 
-        ImVec2 main_view_pos(viewport->WorkPos.x + side_panel.get_width(),
+        ImVec2 main_view_pos(viewport->WorkPos.x + side_panel.getWidth(),
                              viewport->WorkPos.y + 75.0f);
-        ImVec2 main_view_size(viewport->WorkSize.x - side_panel.get_width(),
+        ImVec2 main_view_size(viewport->WorkSize.x - side_panel.getWidth(),
                               viewport->WorkSize.y - 75.0f);
 
         ImGui::SetNextWindowPos(main_view_pos);

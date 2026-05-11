@@ -3,23 +3,22 @@
 #include <../fonts/IconsFontAwesome6.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
-#include <iostream>
 
 TopPanel::TopPanel(float width, ImGuiWindowFlags top_panel_flags)
 {
-    this->width = width;
-    this->top_panel_flags = top_panel_flags;
+    width_ = width;
+    top_panel_flags_ = top_panel_flags;
 }
 
-void TopPanel::generate_view_text(std::string text) const
+void TopPanel::generateViewText(std::string text) const
 {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 2.0f);
-    ImGui::PushStyleColor(ImGuiCol_Button, this->bg_color);
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, this->bg_color);
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, this->bg_color);
-    ImGui::PushStyleColor(ImGuiCol_Border, this->border_color);
+    ImGui::PushStyleColor(ImGuiCol_Button, bg_color_);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, bg_color_);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, bg_color_);
+    ImGui::PushStyleColor(ImGuiCol_Border, border_color_);
 
-    ImGui::Button("##ViewMain", ImVec2(this->view_btn_width, this->view_btn_height));
+    ImGui::Button("##ViewMain", ImVec2(view_btn_width_, view_btn_height_));
 
     ImGui::PopStyleColor(4);
     ImGui::PopStyleVar(1);
@@ -30,40 +29,39 @@ void TopPanel::generate_view_text(std::string text) const
     ImVec2 text2_size = ImGui::CalcTextSize(text.c_str());
     float total_width = text1_size.x + text2_size.x;
 
-    float base_x = p_min.x + (this->view_btn_width - total_width) * 0.5f;
-    float base_y = p_min.y + (this->view_btn_height - text1_size.y) * 0.5f;
+    float base_x = p_min.x + (view_btn_width_ - total_width) * 0.5f;
+    float base_y = p_min.y + (view_btn_height_ - text1_size.y) * 0.5f;
 
     float visual_y_offset = 3.0f;
 
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
     draw_list->AddText(ImVec2(base_x, base_y + visual_y_offset),
-                       ImGui::GetColorU32(this->lighter_text_color), "VIEW ");
+                       ImGui::GetColorU32(lighter_text_color_), "VIEW ");
     draw_list->AddText(ImVec2(base_x + text1_size.x, base_y + visual_y_offset),
-                       ImGui::GetColorU32(this->text_color), text.c_str());
+                       ImGui::GetColorU32(text_color_), text.c_str());
 
     ImGui::SameLine();
 }
 
-void TopPanel::generate_e_stop(const ImGuiViewport* viewport) const
+void TopPanel::generateEStop(const ImGuiViewport* viewport) const
 {
-    float absolute_center_x = (viewport->WorkSize.x - this->e_stop_width) * 0.5f;
-    float cursor_x = absolute_center_x - (this->start_x);
+    float absolute_center_x = (viewport->WorkSize.x - e_stop_width_) * 0.5f;
+    float cursor_x = absolute_center_x - (start_x_);
     ImGui::SetCursorPosX(cursor_x);
 
-    float cursor_y = (ImGui::GetWindowHeight() - this->e_stop_height) * 0.5f;
+    float cursor_y = (ImGui::GetWindowHeight() - e_stop_height_) * 0.5f;
     ImGui::SetCursorPosY(cursor_y);
 
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 2.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5.0f);
-    ImGui::PushStyleColor(ImGuiCol_Button, this->e_stop_color);
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, this->e_stop_hover_color);
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, this->e_stop_color);
-    ImGui::PushStyleColor(ImGuiCol_Border, this->e_stop_border_color);
-    ImGui::PushStyleColor(ImGuiCol_Text, this->e_stop_text_color);
+    ImGui::PushStyleColor(ImGuiCol_Button, e_stop_color_);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, e_stop_hover_color_);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, e_stop_color_);
+    ImGui::PushStyleColor(ImGuiCol_Border, e_stop_border_color_);
+    ImGui::PushStyleColor(ImGuiCol_Text, e_stop_text_color_);
 
-    ImGui::Button(ICON_FA_TRIANGLE_EXCLAMATION "  E-STOP",
-                  ImVec2(this->e_stop_width, this->e_stop_height));
+    ImGui::Button(ICON_FA_TRIANGLE_EXCLAMATION "  E-STOP", ImVec2(e_stop_width_, e_stop_height_));
 
     ImGui::PopStyleColor(5);
     ImGui::PopStyleVar(2);
@@ -71,23 +69,23 @@ void TopPanel::generate_e_stop(const ImGuiViewport* viewport) const
     ImGui::SameLine();
 }
 
-void TopPanel::generate_speed_view(const ImGuiViewport* viewport) const
+void TopPanel::generateSpeedView(const ImGuiViewport* viewport) const
 {
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
-    float cursor_x = viewport->WorkSize.x - this->start_x - 300.0f;
+    float cursor_x = viewport->WorkSize.x - start_x_ - 300.0f;
     ImGui::SetCursorPosX(cursor_x);
     ImGui::SetCursorPosY(0.0f);
 
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 2.0f);
-    ImGui::PushStyleColor(ImGuiCol_Button, this->bg_color);
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, this->bg_color);
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, this->bg_color);
-    ImGui::PushStyleColor(ImGuiCol_Border, this->border_color);
-    ImGui::PushStyleColor(ImGuiCol_Text, this->speed_btn_color);
+    ImGui::PushStyleColor(ImGuiCol_Button, bg_color_);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, bg_color_);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, bg_color_);
+    ImGui::PushStyleColor(ImGuiCol_Border, border_color_);
+    ImGui::PushStyleColor(ImGuiCol_Text, speed_btn_color_);
 
     ImVec2 start_pos = ImGui::GetCursorPos();
 
-    ImGui::Button("2.51 m/s", ImVec2(this->speed_btn_width, this->speed_btn_height));
+    ImGui::Button("2.51 m/s", ImVec2(speed_btn_width_, speed_btn_height_));
 
     ImGui::PopStyleColor(5);
     ImGui::PopStyleVar(1);
@@ -107,15 +105,15 @@ void TopPanel::generate_speed_view(const ImGuiViewport* viewport) const
     ImGui::SetCursorPosY(0.0f);
 }
 
-void TopPanel::generate_drive_btn(const ImGuiViewport* viewport) const
+void TopPanel::generateDriveBtn(const ImGuiViewport* viewport) const
 {
 
-    ImGui::PushStyleColor(ImGuiCol_Button, this->drive_btn_color);
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, this->drive_btn_hover_color);
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, this->drive_btn_hover_color);
-    ImGui::PushStyleColor(ImGuiCol_Text, this->drive_text_color);
+    ImGui::PushStyleColor(ImGuiCol_Button, drive_btn_color_);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, drive_btn_hover_color_);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, drive_btn_hover_color_);
+    ImGui::PushStyleColor(ImGuiCol_Text, drive_text_color_);
 
-    ImGui::Button(ICON_FA_GAMEPAD "DRIVE", ImVec2(drive_btn_width, drive_btn_height));
+    ImGui::Button(ICON_FA_GAMEPAD "DRIVE", ImVec2(drive_btn_width_, drive_btn_height_));
 
     ImGui::PopStyleColor(4);
     ImGui::PopStyleVar();
@@ -123,25 +121,25 @@ void TopPanel::generate_drive_btn(const ImGuiViewport* viewport) const
 
 void TopPanel::render(const ImGuiViewport* viewport) const
 {
-    ImVec2 top_panel_pos(viewport->WorkPos.x + this->start_x, viewport->WorkPos.y);
-    ImVec2 top_panel_size(this->width, this->height);
+    ImVec2 top_panel_pos(viewport->WorkPos.x + start_x_, viewport->WorkPos.y);
+    ImVec2 top_panel_size(width_, height_);
 
     ImGui::SetNextWindowPos(top_panel_pos);
     ImGui::SetNextWindowSize(top_panel_size);
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 
-    ImGui::Begin("TopPanel", nullptr, this->top_panel_flags);
+    ImGui::Begin("TopPanel", nullptr, top_panel_flags_);
 
-    ImGui::SetWindowFontScale(this->font_scale);
+    ImGui::SetWindowFontScale(font_scale_);
 
-    TopPanel::generate_view_text("Maintenance");
+    TopPanel::generateViewText("Maintenance");
 
-    TopPanel::generate_e_stop(viewport);
+    TopPanel::generateEStop(viewport);
 
-    TopPanel::generate_speed_view(viewport);
+    TopPanel::generateSpeedView(viewport);
 
-    TopPanel::generate_drive_btn(viewport);
+    TopPanel::generateDriveBtn(viewport);
 
     ImGui::End();
 
