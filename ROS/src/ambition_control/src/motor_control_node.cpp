@@ -12,6 +12,7 @@ class MotorControlNode : public rclcpp::Node
   public:
     MotorControlNode() : Node("motor_control_node")
     {
+        using namespace std::chrono_literals;
         using std::placeholders::_1;
 
         this->declare_parameter<double>("kv", 1);
@@ -46,11 +47,17 @@ class MotorControlNode : public rclcpp::Node
 
         pCmdVel_subscriber_ = this->create_subscription<geometry_msgs::msg::Twist>(
             "/cmd_vel", 10, std::bind(&MotorControlNode::cmdVelCallback, this, _1));
+
+        pClock_            = this->get_clock();
+        last_cmd_vel_time_ = pClock_->now();
+
+        pWatchdog_timer_ =
+            this->create_wall_timer(100ms, std::bind(&MotorControlNode::watchdogCallback, this));
     };
 
     ~MotorControlNode() = default;
 
-    void init()
+    [[nodiscard]] bool init()
     {
         // addDevice
         {
@@ -59,7 +66,7 @@ class MotorControlNode : public rclcpp::Node
                 if (!rclcpp::ok())
                 {
                     RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for service");
-                    return;
+                    return false;
                 }
 
                 RCLCPP_INFO(this->get_logger(), "Waiting for /md/add_mds service...");
@@ -74,7 +81,7 @@ class MotorControlNode : public rclcpp::Node
             if (result != rclcpp::FutureReturnCode::SUCCESS)
             {
                 RCLCPP_ERROR(this->get_logger(), "Service call failed");
-                return;
+                return false;
             }
 
             auto response = future.get();
@@ -91,7 +98,7 @@ class MotorControlNode : public rclcpp::Node
             if (!all_ok)
             {
                 RCLCPP_ERROR(this->get_logger(), "Motor initialization failed");
-                return;
+                return false;
             }
 
             RCLCPP_INFO(this->get_logger(), "Added motors successfully");
@@ -104,7 +111,7 @@ class MotorControlNode : public rclcpp::Node
                 if (!rclcpp::ok())
                 {
                     RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for service");
-                    return;
+                    return false;
                 }
 
                 RCLCPP_INFO(this->get_logger(), "Waiting for /md/enable service...");
@@ -119,7 +126,7 @@ class MotorControlNode : public rclcpp::Node
             if (result != rclcpp::FutureReturnCode::SUCCESS)
             {
                 RCLCPP_ERROR(this->get_logger(), "Service call failed");
-                return;
+                return false;
             }
 
             auto response = future.get();
@@ -136,7 +143,7 @@ class MotorControlNode : public rclcpp::Node
             if (!all_ok)
             {
                 RCLCPP_INFO(this->get_logger(), "Motor initialization failed");
-                return;
+                return false;
             }
 
             RCLCPP_INFO(this->get_logger(), "Enabled motors successfully");
@@ -149,7 +156,7 @@ class MotorControlNode : public rclcpp::Node
                 if (!rclcpp::ok())
                 {
                     RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for service");
-                    return;
+                    return false;
                 }
 
                 RCLCPP_INFO(this->get_logger(), "Waiting for /md/set_mode service...");
@@ -165,7 +172,7 @@ class MotorControlNode : public rclcpp::Node
             if (result != rclcpp::FutureReturnCode::SUCCESS)
             {
                 RCLCPP_ERROR(this->get_logger(), "Service call failed");
-                return;
+                return false;
             }
 
             auto response = future.get();
@@ -182,11 +189,54 @@ class MotorControlNode : public rclcpp::Node
             if (!all_ok)
             {
                 RCLCPP_INFO(this->get_logger(), "Motor initialization failed");
-                return;
+                return false;
             }
 
             RCLCPP_INFO(this->get_logger(), "Motor initialization completed successfully");
+            last_cmd_vel_time_ = pClock_->now();
+            return true;
         }
+    }
+
+    void disableDrives()
+    {
+        // disable drives
+        if (!pDisable_client_->wait_for_service(std::chrono::seconds(1)))
+        {
+            RCLCPP_INFO(this->get_logger(), "Disable service not available, skipping cleanup.");
+            return;
+        }
+
+        auto request        = std::make_shared<candle_ros2::srv::Generic::Request>();
+        request->device_ids = device_ids_;
+
+        auto future = pDisable_client_->async_send_request(request);
+        auto result = rclcpp::spin_until_future_complete(shared_from_this(), future);
+
+        if (result != rclcpp::FutureReturnCode::SUCCESS)
+        {
+            RCLCPP_ERROR(this->get_logger(), "Disable service call failed");
+            return;
+        }
+
+        auto response = future.get();
+
+        bool all_ok = true;
+        for (size_t i = 0; i < response->success.size(); ++i)
+            if (!response->success[i])
+            {
+                all_ok = false;
+                RCLCPP_ERROR(
+                    this->get_logger(), "Failed to disable motor %d", request->device_ids[i]);
+            }
+
+        if (!all_ok)
+        {
+            RCLCPP_INFO(this->get_logger(), "Failed to disable motors");
+            return;
+        }
+
+        RCLCPP_INFO(this->get_logger(), "Motors disabled successfully");
     }
 
   private:
@@ -200,6 +250,11 @@ class MotorControlNode : public rclcpp::Node
     rclcpp::Publisher<candle_ros2::msg::MotionCmd>::SharedPtr  pMotion_publisher_  = nullptr;
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr pCmdVel_subscriber_ = nullptr;
 
+    rclcpp::TimerBase::SharedPtr pWatchdog_timer_ = nullptr;
+    rclcpp::Clock::SharedPtr     pClock_          = nullptr;
+    rclcpp::Time                 last_cmd_vel_time_{0};
+    rclcpp::Duration             watchdog_timeout_{0, 500000};
+
     double kv_           = 1.0;
     double kw_           = 1.0;
     float  v_max_        = 10.0;
@@ -209,6 +264,9 @@ class MotorControlNode : public rclcpp::Node
   private:
     void cmdVelCallback(const geometry_msgs::msg::Twist::SharedPtr msg)
     {
+        // update the timestamp
+        last_cmd_vel_time_ = pClock_->now();
+
         double v = kv_ * msg->linear.x;
         double w = kw_ * msg->angular.z;
 
@@ -226,15 +284,37 @@ class MotorControlNode : public rclcpp::Node
 
         pMotion_publisher_->publish(pub_msg);
     }
+
+    void watchdogCallback()
+    {
+        if ((pClock_->now() - last_cmd_vel_time_) < watchdog_timeout_)
+            return;
+
+        RCLCPP_WARN_THROTTLE(
+            this->get_logger(), *pClock_, 1000, "Watchdog triggered: No cmd_vel received.");
+
+        // stop motors
+        auto pub_msg            = candle_ros2::msg::MotionCmd();
+        pub_msg.device_ids      = std::vector<uint32_t>(device_ids_.begin(), device_ids_.end());
+        pub_msg.target_position = {0.0, 0.0, 0.0, 0.0};
+        pub_msg.target_torque   = {0.0, 0.0, 0.0, 0.0};
+        pub_msg.target_velocity = {0.0, 0.0, 0.0, 0.0};
+
+        pMotion_publisher_->publish(pub_msg);
+    }
 };
 
 int main(int argc, char* argv[])
 {
     rclcpp::init(argc, argv);
     auto node = std::make_shared<MotorControlNode>();
-    node->init();
 
-    rclcpp::spin(node);
+    // spin only when succesfully initialized
+    if (node->init())
+        rclcpp::spin(node);
+
+    node->disableDrives();
+
     rclcpp::shutdown();
     return 0;
 }
