@@ -134,7 +134,8 @@ void TopPanel::generateModeBtn(mode_E& current_mode)
     ImGui::PopStyleColor(4);
 }
 
-void TopPanel::render(const ImGuiViewport* viewport, mode_E& current_mode)
+void TopPanel::render(const ImGuiViewport* viewport, mode_E& current_mode,
+                      const std::string& view_name)
 {
     ImVec2 top_panel_pos(viewport->WorkPos.x + start_x_, viewport->WorkPos.y);
     ImVec2 top_panel_size(width_, height_);
@@ -148,7 +149,7 @@ void TopPanel::render(const ImGuiViewport* viewport, mode_E& current_mode)
 
     ImGui::SetWindowFontScale(font_scale_);
 
-    generateViewText("Maintenance");
+    generateViewText(view_name);
 
     generateEStop(viewport);
 

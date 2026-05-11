@@ -13,7 +13,7 @@ class TopPanel
         ARM
     };
 
-    void render(const ImGuiViewport* viewport, mode_E& current_mode);
+    void render(const ImGuiViewport* viewport, mode_E& current_mode, const std::string& view_name);
 
   private:
     float width_;

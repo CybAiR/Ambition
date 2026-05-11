@@ -42,8 +42,9 @@ int main(int argc, char* argv[])
     style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.40f, 0.40f, 0.40f, 1.00f);
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
-    SDL_Window* window = SDL_CreateWindow("App", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                          1280, 720, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    SDL_Window* window =
+        SDL_CreateWindow("Ambition GUI", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720,
+                         SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
     SDL_GLContext gl_context = SDL_GL_CreateContext(window);
     SDL_GL_MakeCurrent(window, gl_context);
@@ -89,8 +90,27 @@ int main(int argc, char* argv[])
         ImGuiWindowFlags top_panel_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
                                            ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse;
 
+        std::string view_name;
+        switch (active_view)
+        {
+        case Views::Science:
+            view_name = "Science";
+            break;
+
+        case Views::Navigation:
+            view_name = "Navigation";
+            break;
+
+        case Views::Maintenance:
+            view_name = "Maintenance";
+            break;
+
+        case Views::Probing:
+            view_name = "Probing";
+            break;
+        }
         TopPanel top_panel(viewport->WorkSize.x, top_panel_flags);
-        top_panel.render(viewport, current_mode);
+        top_panel.render(viewport, current_mode, view_name);
 
         SidePanel side_panel(side_panel_flags);
         side_panel.render(viewport, active_view);
