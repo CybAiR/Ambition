@@ -31,8 +31,6 @@ class ProbingView : public View
     void renderRightColumn(float width) const;
     void renderArmTelemetryCard(const armTelemetry_S& arm, const gripperTelemetry_S& gripper) const;
     void renderMissionProgressCard(const missionProgress_S& mission) const;
-    bool renderColoredButton(const char* label, const ImVec2& size, const ImVec4& base_color,
-                             const ImVec4& hover_color) const;
     void innerSeparator() const;
 
     static const char* toString(gripperState_E state);

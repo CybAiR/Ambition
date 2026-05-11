@@ -23,15 +23,14 @@ void MaintenanceView::innerSeparator() const
 {
     ImGui::Dummy(ImVec2(0.0f, 6.0f));
 
-    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    ImDrawList* pDraw_list = ImGui::GetWindowDrawList();
 
     const ImVec2 pos = ImGui::GetWindowPos();
     const ImVec2 size = ImGui::GetWindowSize();
     const float y = ImGui::GetCursorScreenPos().y;
 
-    draw_list->AddLine(ImVec2(pos.x + K_CARD_PAD_X, y), ImVec2(pos.x + size.x - K_CARD_PAD_X, y),
-                       ImGui::GetColorU32(K_BORDER) // kBorder comes from View.h
-    );
+    pDraw_list->AddLine(ImVec2(pos.x + K_CARD_PAD_X, y), ImVec2(pos.x + size.x - K_CARD_PAD_X, y),
+                        ImGui::GetColorU32(K_BORDER));
 
     ImGui::Dummy(ImVec2(0.0f, 10.0f));
 }
@@ -129,7 +128,7 @@ void MaintenanceView::renderArmTelemetryCard(const armTelemetry_S& arm,
 
         struct floatRow_S
         {
-            const char* label;
+            const char* pLabel;
             float value;
         };
 
@@ -145,7 +144,7 @@ void MaintenanceView::renderArmTelemetryCard(const armTelemetry_S& arm,
 
         for (const floatRow_S& row : joints)
         {
-            valueRow(K_LABEL_X, K_VALUE_X, K_BLUE, row.label, "%.0f°", row.value);
+            valueRow(K_LABEL_X, K_VALUE_X, K_BLUE, row.pLabel, "%.0f°", row.value);
         }
 
         innerSeparator();
@@ -158,7 +157,7 @@ void MaintenanceView::renderArmTelemetryCard(const armTelemetry_S& arm,
 
         for (const floatRow_S& row : position)
         {
-            valueRow(K_LABEL_X, K_VALUE_X, K_PURPLE, row.label, "%.2f m", row.value);
+            valueRow(K_LABEL_X, K_VALUE_X, K_PURPLE, row.pLabel, "%.2f m", row.value);
         }
 
         innerSeparator();
@@ -186,7 +185,7 @@ void MaintenanceView::renderJointDiagnostics(const jointDiagnostics_S& joints) c
 
         struct jointRow_S
         {
-            const char* label;
+            const char* pLabel;
             float temp;
             float current;
         };
@@ -200,7 +199,7 @@ void MaintenanceView::renderJointDiagnostics(const jointDiagnostics_S& joints) c
         for (const auto& row : rows)
         {
             ImGui::SetCursorPosX(K_CARD_PAD_X);
-            ImGui::TextColored(K_TITLE_TEXT, "%s", row.label);
+            ImGui::TextColored(K_TITLE_TEXT, "%s", row.pLabel);
 
             ImGui::SameLine(temp_x);
             const ImVec4 temp_color = (row.temp >= 65.0f) ? K_WARNING_RED : K_MUTED_TEXT;

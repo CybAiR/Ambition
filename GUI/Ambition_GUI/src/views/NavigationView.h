@@ -65,8 +65,6 @@ class NavigationView : public View
     void renderEstimatedKinematics() const;
     void renderWaypointEditor();
     void InnerSeparator() const;
-    bool renderColoredButton(const char* label, const ImVec2& size, const ImVec4& base_color,
-                             const ImVec4& hover_color);
 
     static const char* toString(statusState_E state);
     static const char* toString(waypointState_E state);

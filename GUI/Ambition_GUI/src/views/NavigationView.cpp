@@ -35,17 +35,6 @@ const ImVec4 K_BUTTON_HOVER = ImVec4(0.30f, 0.30f, 0.30f, 1.0f);
 const ImVec4 K_PANEL_BG = ImVec4(0.08f, 0.08f, 0.08f, 1.0f);
 } // namespace
 
-bool NavigationView::renderColoredButton(const char* label, const ImVec2& size,
-                                         const ImVec4& base_color, const ImVec4& hover_color)
-{
-    ImGui::PushStyleColor(ImGuiCol_Button, base_color);
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, hover_color);
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, base_color);
-    const bool is_clicked = ImGui::Button(label, size);
-    ImGui::PopStyleColor(3);
-    return is_clicked;
-}
-
 void NavigationView::InnerSeparator() const
 {
     ImGui::Dummy(ImVec2(0.0f, 6.0f));

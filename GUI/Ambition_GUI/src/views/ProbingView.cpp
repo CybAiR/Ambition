@@ -24,32 +24,18 @@ const ImVec4 K_RESET_HOVER = ImVec4(0.35f, 0.18f, 0.18f, 1.0f);
 const ImVec4 K_RESET_TEXT = ImVec4(0.85f, 0.40f, 0.40f, 1.0f);
 } // namespace
 
-bool ProbingView::renderColoredButton(const char* label, const ImVec2& size,
-                                      const ImVec4& base_color, const ImVec4& hover_color) const
-{
-    ImGui::PushStyleColor(ImGuiCol_Button, base_color);
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, hover_color);
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, base_color);
-
-    const bool clicked = ImGui::Button(label, size);
-
-    ImGui::PopStyleColor(3);
-
-    return clicked;
-}
-
 void ProbingView::innerSeparator() const
 {
     ImGui::Dummy(ImVec2(0.0f, 6.0f));
 
-    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    ImDrawList* pDraw_list = ImGui::GetWindowDrawList();
 
     const ImVec2 pos = ImGui::GetWindowPos();
     const ImVec2 size = ImGui::GetWindowSize();
     const float y = ImGui::GetCursorScreenPos().y;
 
-    draw_list->AddLine(ImVec2(pos.x + K_CARD_PAD_X, y), ImVec2(pos.x + size.x - K_CARD_PAD_X, y),
-                       ImGui::GetColorU32(K_BORDER));
+    pDraw_list->AddLine(ImVec2(pos.x + K_CARD_PAD_X, y), ImVec2(pos.x + size.x - K_CARD_PAD_X, y),
+                        ImGui::GetColorU32(K_BORDER));
 
     ImGui::Dummy(ImVec2(0.0f, 10.0f));
 }
@@ -145,7 +131,7 @@ void ProbingView::renderArmTelemetryCard(const armTelemetry_S& arm,
 
         struct floatRow_S
         {
-            const char* label;
+            const char* pLabel;
             float value;
         };
 
@@ -161,7 +147,7 @@ void ProbingView::renderArmTelemetryCard(const armTelemetry_S& arm,
 
         for (const floatRow_S& row : joints)
         {
-            valueRow(K_LABEL_X, K_VALUE_X, K_BLUE, row.label, "%.0f°", row.value);
+            valueRow(K_LABEL_X, K_VALUE_X, K_BLUE, row.pLabel, "%.0f°", row.value);
         }
 
         innerSeparator();
@@ -174,7 +160,7 @@ void ProbingView::renderArmTelemetryCard(const armTelemetry_S& arm,
 
         for (const floatRow_S& row : position)
         {
-            valueRow(K_LABEL_X, K_VALUE_X, K_PURPLE, row.label, "%.2f m", row.value);
+            valueRow(K_LABEL_X, K_VALUE_X, K_PURPLE, row.pLabel, "%.2f m", row.value);
         }
 
         innerSeparator();

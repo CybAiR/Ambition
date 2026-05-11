@@ -6,9 +6,11 @@
 class ScienceView : public View
 {
   public:
-    ScienceView(ImGuiWindowFlags flags = 0);
+    ScienceView(ImGuiWindowFlags flags = 0) : View(flags)
+    {
+    }
 
-    enum class Action
+    enum class action_E
     {
         None,
         DrillStart,
@@ -19,24 +21,24 @@ class ScienceView : public View
         Slot4
     };
 
-    enum class DrillState
+    enum class drillState_E
     {
         Idle,
         Running,
         Error
     };
 
-    struct DrillTelemetry
+    struct drillTelemetry_S
     {
-        DrillState state = DrillState::Idle;
+        drillState_E state = drillState_E::Idle;
         float depth_cm = 12.0f;
     };
 
-    struct State
+    struct state_S
     {
         gpsOdometry_S gps;
         armTelemetry_S arm;
-        DrillTelemetry drill;
+        drillTelemetry_S drill;
         gripperTelemetry_S gripper;
 
         std::array<bool, 4> container_filled = {false, false, false, false};
@@ -45,39 +47,29 @@ class ScienceView : public View
     };
 
   public:
-    Action Render();
-    Action Render(const State& state);
-
-    State& Data() noexcept
-    {
-        return state_;
-    }
-    const State& Data() const noexcept
-    {
-        return state_;
-    }
+    action_E render();
 
   private:
-    Action RenderLeftColumn(const State& state, float width);
-    Action RenderBottomPanel(const State& state) const;
+    action_E renderLeftColumn(float width);
+    action_E renderBottomPanel() const;
 
-    Action RenderContainersSection(const State& state, float width) const;
-    Action RenderDrillSection(const DrillTelemetry& drill, float width) const;
-    void RenderScaleSection(float scale_weight_g, float width) const;
+    action_E renderContainersSection(float width) const;
+    action_E renderDrillSection(const drillTelemetry_S& drill, float width) const;
+    void renderScaleSection(float scale_weight_g, float width) const;
 
-    void RenderRightColumn(const State& state, float width) const;
+    void renderRightColumn(float width) const;
 
-    void RenderArmTelemetryCard(const armTelemetry_S& arm, const gripperTelemetry_S& gripper) const;
+    void renderArmTelemetryCard(const armTelemetry_S& arm, const gripperTelemetry_S& gripper) const;
 
-    bool RenderSlotButton(const char* id, const char* label, bool is_filled,
+    bool renderSlotButton(const char* id, const char* label, bool is_filled,
                           float cell_width) const;
 
-    static const char* ToString(DrillState state) noexcept;
-    static const char* ToString(gripperState_E state) noexcept;
+    static const char* toString(drillState_E state) noexcept;
+    static const char* toString(gripperState_E state) noexcept;
 
-    void InnerSeparator() const;
+    void innerSeparator() const;
 
   private:
-    State state_;
+    state_S state_;
     bool is_camera_fullscreen_ = false;
 };

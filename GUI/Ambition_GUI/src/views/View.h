@@ -72,6 +72,9 @@ class View
     bool renderCameraContainer(float height, const char* title, bool is_screenshot_enabled,
                                bool is_fullscreen_button_enabled, bool is_fullscreen_active) const;
     void renderGpsCard(const gpsOdometry_S& gps) const;
+    bool renderColoredButton(const char* label, const ImVec2& size, const ImVec4& base_color,
+                             const ImVec4& hover_color) const;
+
     bool beginCard(const char* id, const ImVec2& size) const;
     void drawHeader(const char* title, float text_y = 5.0f) const;
     void valueRow(float label_x, float value_x, const ImVec4& value_color, const char* label,

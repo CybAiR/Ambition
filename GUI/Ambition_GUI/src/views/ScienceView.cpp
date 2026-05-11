@@ -1,114 +1,76 @@
 #include "ScienceView.h"
 #include <../fonts/IconsFontAwesome6.h>
 
+#include <algorithm>
 #include <cstdarg>
 #include <imgui.h>
 
 namespace
 {
-constexpr float kRightPanelWidth = 400.0f;
-constexpr float kMinLeftWidth = 240.0f;
-constexpr float kMinRightWidth = 180.0f;
+constexpr float K_RIGHT_PANEL_WIDTH = 400.0f;
+constexpr float K_MIN_LEFT_WIDTH = 240.0f;
+constexpr float K_MIN_RIGHT_WIDTH = 180.0f;
 
-constexpr float kOuterPadX = 10.0f;
-constexpr float kOuterPadY = 10.0f;
+constexpr float K_OUTER_PAD_X = 10.0f;
+constexpr float K_OUTER_PAD_Y = 10.0f;
 
-constexpr float kBottomPanelHeight = 170.0f;
+constexpr float K_BOTTOM_PANEL_HEIGHT = 170.0f;
 
-constexpr float kSectionPadX = 16.0f;
+constexpr float K_SECTION_PAD_X = 16.0f;
 
-constexpr float kSlotButtonSize = 32.0f;
-constexpr float kSlotCellWidth = 72.0f;
+constexpr float K_SLOT_BUTTON_SIZE = 32.0f;
+constexpr float K_SLOT_CELL_WIDTH = 72.0f;
 
-const ImVec4 kPanelBg = ImVec4(0.08f, 0.08f, 0.08f, 1.0f);
-const ImVec4 kDrillStateText = ImVec4(0.30f, 0.50f, 0.90f, 1.0f);
+const ImVec4 K_PANEL_BG = ImVec4(0.08f, 0.08f, 0.08f, 1.0f);
+const ImVec4 K_DRILL_STATE_TEXT = ImVec4(0.30f, 0.50f, 0.90f, 1.0f);
 
-const ImVec4 kStartButton = ImVec4(0.15f, 0.35f, 0.15f, 1.0f);
-const ImVec4 kStartButtonHover = ImVec4(0.20f, 0.45f, 0.20f, 1.0f);
+const ImVec4 K_START_BUTTON = ImVec4(0.15f, 0.35f, 0.15f, 1.0f);
+const ImVec4 K_START_BUTTON_HOVER = ImVec4(0.20f, 0.45f, 0.20f, 1.0f);
 
-const ImVec4 kStopButton = ImVec4(0.45f, 0.15f, 0.15f, 1.0f);
-const ImVec4 kStopButtonHover = ImVec4(0.55f, 0.20f, 0.20f, 1.0f);
+const ImVec4 K_STOP_BUTTON = ImVec4(0.45f, 0.15f, 0.15f, 1.0f);
+const ImVec4 K_STOP_BUTTON_HOVER = ImVec4(0.55f, 0.20f, 0.20f, 1.0f);
 
-const ImVec4 kSlotGreen = ImVec4(0.18f, 0.49f, 0.20f, 1.0f);
-const ImVec4 kSlotGreenFilled = ImVec4(0.18f, 0.49f, 0.20f, 0.4f);
-const ImVec4 kSlotGreenHover = ImVec4(0.18f, 0.49f, 0.20f, 0.6f);
-const ImVec4 kTransparent = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
-
-float Max(float a, float b) noexcept
-{
-    return a > b ? a : b;
-}
-
-float Clamp(float value, float min_value, float max_value) noexcept
-{
-    if (value < min_value)
-        return min_value;
-
-    if (value > max_value)
-        return max_value;
-
-    return value;
-}
-
-bool ColoredButton(const char* label, const ImVec2& size, const ImVec4& base, const ImVec4& hover)
-{
-    ImGui::PushStyleColor(ImGuiCol_Button, base);
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, hover);
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, base);
-
-    const bool clicked = ImGui::Button(label, size);
-
-    ImGui::PopStyleColor(3);
-
-    return clicked;
-}
+const ImVec4 K_SLOT_GREEN = ImVec4(0.18f, 0.49f, 0.20f, 1.0f);
+const ImVec4 K_SLOT_GREEN_FILLED = ImVec4(0.18f, 0.49f, 0.20f, 0.4f);
+const ImVec4 K_SLOT_GREEN_HOVER = ImVec4(0.18f, 0.49f, 0.20f, 0.6f);
+const ImVec4 K_TRANSPARENT = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
 } // namespace
 
-// Constructor passes flags up to base View
-ScienceView::ScienceView(ImGuiWindowFlags flags) : View(flags)
-{
-}
-
-ScienceView::Action ScienceView::Render()
-{
-    return Render(state_);
-}
-
-ScienceView::Action ScienceView::Render(const State& state)
+ScienceView::action_E ScienceView::render()
 {
     ImGui::PushID(this);
 
     const ImVec2 avail = ImGui::GetContentRegionAvail();
-    Action action = Action::None;
+    action_E action = action_E::None;
 
     if (is_camera_fullscreen_)
     {
-        action = RenderLeftColumn(state, avail.x);
+        action = renderLeftColumn(avail.x);
     }
     else
     {
         const float gap_x = ImGui::GetStyle().ItemSpacing.x;
-        float right_width = kRightPanelWidth;
+        float right_width = K_RIGHT_PANEL_WIDTH;
 
-        if (avail.x < kMinLeftWidth + right_width + gap_x)
+        if (avail.x < K_MIN_LEFT_WIDTH + right_width + gap_x)
         {
-            right_width = avail.x - kMinLeftWidth - gap_x;
+            right_width = avail.x - K_MIN_LEFT_WIDTH - gap_x;
         }
 
-        right_width = Clamp(right_width, kMinRightWidth, kRightPanelWidth);
+        right_width = std::clamp(right_width, K_MIN_RIGHT_WIDTH, K_RIGHT_PANEL_WIDTH);
 
-        if (avail.x < kMinLeftWidth + kMinRightWidth + gap_x)
+        if (avail.x < K_MIN_LEFT_WIDTH + K_MIN_RIGHT_WIDTH + gap_x)
         {
-            right_width = Max(avail.x * 0.35f, 1.0f);
+            right_width = std::max(avail.x * 0.35f, 1.0f);
         }
 
         float left_width = avail.x - right_width - gap_x;
-        left_width = Max(left_width, 1.0f);
+        left_width = std::max(left_width, 1.0f);
 
-        action = RenderLeftColumn(state, left_width);
+        action = renderLeftColumn(left_width);
 
         ImGui::SameLine(0.0f, gap_x);
-        RenderRightColumn(state, right_width);
+        renderRightColumn(right_width);
     }
 
     ImGui::PopID();
@@ -116,9 +78,9 @@ ScienceView::Action ScienceView::Render(const State& state)
     return action;
 }
 
-ScienceView::Action ScienceView::RenderLeftColumn(const State& state, float width)
+ScienceView::action_E ScienceView::renderLeftColumn(float width)
 {
-    Action action = Action::None;
+    action_E action = action_E::None;
 
     if (ImGui::BeginChild("LeftColumn", ImVec2(width, 0.0f), false, kNoScrollFlags))
     {
@@ -126,8 +88,8 @@ ScienceView::Action ScienceView::RenderLeftColumn(const State& state, float widt
         const ImVec2 avail = ImGui::GetContentRegionAvail();
 
         const bool was_fullscreen = is_camera_fullscreen_;
-        float camera_height = was_fullscreen ? avail.y : (avail.y - kBottomPanelHeight - gap_y);
-        camera_height = Max(camera_height, 1.0f);
+        float camera_height = was_fullscreen ? avail.y : (avail.y - K_BOTTOM_PANEL_HEIGHT - gap_y);
+        camera_height = std::max(camera_height, 1.0f);
 
         const bool is_fullscreen_toggled = renderCameraContainer(
             camera_height, "MAIN CAMERA (SCIENCE)", true, true, was_fullscreen);
@@ -139,7 +101,7 @@ ScienceView::Action ScienceView::RenderLeftColumn(const State& state, float widt
 
         if (!was_fullscreen && !is_fullscreen_toggled)
         {
-            action = RenderBottomPanel(state);
+            action = renderBottomPanel();
         }
     }
 
@@ -148,15 +110,14 @@ ScienceView::Action ScienceView::RenderLeftColumn(const State& state, float widt
     return action;
 }
 
-ScienceView::Action ScienceView::RenderBottomPanel(const State& state) const
+ScienceView::action_E ScienceView::renderBottomPanel() const
 {
-    Action action = Action::None;
+    action_E action = action_E::None;
 
-    ImGui::PushStyleColor(ImGuiCol_ChildBg, kPanelBg);
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, K_PANEL_BG);
 
-    if (ImGui::BeginChild("BottomPanel", ImVec2(0.0f, kBottomPanelHeight), true, kNoScrollFlags))
+    if (ImGui::BeginChild("BottomPanel", ImVec2(0.0f, K_BOTTOM_PANEL_HEIGHT), true, kNoScrollFlags))
     {
-        // Changed to use the base View DrawHeader signature
         drawHeader("SAMPLE DATA");
 
         ImGui::SetCursorPos(ImVec2(0.0f, K_HEADER_HEIGHT + 6.0f));
@@ -164,32 +125,32 @@ ScienceView::Action ScienceView::RenderBottomPanel(const State& state) const
         const ImVec2 region = ImGui::GetContentRegionAvail();
         const ImVec2 content_pos = ImGui::GetCursorScreenPos();
 
-        const float section_width = Max(region.x / 3.0f, 1.0f);
-        const float last_section_width = Max(region.x - section_width * 2.0f, 1.0f);
+        const float section_width = std::max(region.x / 3.0f, 1.0f);
+        const float last_section_width = std::max(region.x - section_width * 2.0f, 1.0f);
 
-        ImDrawList* draw_list = ImGui::GetWindowDrawList();
+        ImDrawList* pDraw_list = ImGui::GetWindowDrawList();
         const ImU32 line_color = ImGui::GetColorU32(K_BORDER);
 
-        draw_list->AddLine(ImVec2(content_pos.x + section_width, content_pos.y),
-                           ImVec2(content_pos.x + section_width, content_pos.y + region.y),
-                           line_color);
+        pDraw_list->AddLine(ImVec2(content_pos.x + section_width, content_pos.y),
+                            ImVec2(content_pos.x + section_width, content_pos.y + region.y),
+                            line_color);
 
-        draw_list->AddLine(ImVec2(content_pos.x + section_width * 2.0f, content_pos.y),
-                           ImVec2(content_pos.x + section_width * 2.0f, content_pos.y + region.y),
-                           line_color);
+        pDraw_list->AddLine(ImVec2(content_pos.x + section_width * 2.0f, content_pos.y),
+                            ImVec2(content_pos.x + section_width * 2.0f, content_pos.y + region.y),
+                            line_color);
 
-        action = RenderContainersSection(state, section_width);
+        action = renderContainersSection(section_width);
 
         ImGui::SameLine(0.0f, 0.0f);
 
-        const Action drill_action = RenderDrillSection(state.drill, section_width);
+        const action_E drill_action = renderDrillSection(state_.drill, section_width);
 
-        if (action == Action::None)
+        if (action == action_E::None)
             action = drill_action;
 
         ImGui::SameLine(0.0f, 0.0f);
 
-        RenderScaleSection(state.scale_weight_g, last_section_width);
+        renderScaleSection(state_.scale_weight_g, last_section_width);
     }
 
     ImGui::EndChild();
@@ -198,39 +159,41 @@ ScienceView::Action ScienceView::RenderBottomPanel(const State& state) const
     return action;
 }
 
-ScienceView::Action ScienceView::RenderContainersSection(const State& state, float width) const
+ScienceView::action_E ScienceView::renderContainersSection(float width) const
 {
-    Action action = Action::None;
+    action_E action = action_E::None;
 
     if (ImGui::BeginChild("ContainersSection", ImVec2(width, 0.0f), false, kNoScrollNoBgFlags))
     {
-        constexpr float top_reserved_height = 20.0f;
-        constexpr float row_gap = 4.0f;
+        constexpr float TOP_RESERVED_HEIGHT = 20.0f;
+        constexpr float ROW_GAP = 4.0f;
 
-        ImGui::SetCursorPosX(kSectionPadX);
+        ImGui::SetCursorPosX(K_SECTION_PAD_X);
         ImGui::TextColored(K_SECTION_TEXT, "CONTAINERS");
 
-        const float inner_width = Max(width - kSectionPadX * 2.0f, 1.0f);
+        const float inner_width = std::max(width - K_SECTION_PAD_X * 2.0f, 1.0f);
         const float text_height = ImGui::GetTextLineHeight();
 
-        const float block_height = kSlotButtonSize + ImGui::GetStyle().ItemSpacing.y + text_height;
+        const float block_height =
+            K_SLOT_BUTTON_SIZE + ImGui::GetStyle().ItemSpacing.y + text_height;
 
-        const float total_height = block_height * 2.0f + row_gap;
+        const float total_height = block_height * 2.0f + ROW_GAP;
 
-        float y1 = top_reserved_height +
-                   (ImGui::GetWindowHeight() - top_reserved_height - total_height) * 0.5f;
+        float y1 = TOP_RESERVED_HEIGHT +
+                   (ImGui::GetWindowHeight() - TOP_RESERVED_HEIGHT - total_height) * 0.5f;
 
-        y1 = Max(y1, top_reserved_height + 2.0f);
+        y1 = std::max(y1, TOP_RESERVED_HEIGHT + 2.0f);
 
-        const float y2 = y1 + block_height + row_gap;
+        const float y2 = y1 + block_height + ROW_GAP;
 
-        const float x1 = kSectionPadX + inner_width * 0.25f - kSlotCellWidth * 0.5f;
+        const float x1 = K_SECTION_PAD_X + inner_width * 0.25f - K_SLOT_CELL_WIDTH * 0.5f;
 
-        const float x2 = kSectionPadX + inner_width * 0.75f - kSlotCellWidth * 0.5f;
+        const float x2 = K_SECTION_PAD_X + inner_width * 0.75f - K_SLOT_CELL_WIDTH * 0.5f;
 
         const char* labels[4] = {"SLOT 1", "SLOT 2", "SLOT 3", "SLOT 4"};
 
-        const Action actions[4] = {Action::Slot1, Action::Slot2, Action::Slot3, Action::Slot4};
+        const action_E actions[4] = {action_E::Slot1, action_E::Slot2, action_E::Slot3,
+                                     action_E::Slot4};
 
         for (int i = 0; i < 4; ++i)
         {
@@ -240,10 +203,11 @@ ScienceView::Action ScienceView::RenderContainersSection(const State& state, flo
             const float x = right_column ? x2 : x1;
             const float y = bottom_row ? y2 : y1;
 
-            ImGui::SetCursorPos(ImVec2(Max(x, kSectionPadX), y));
+            ImGui::SetCursorPos(ImVec2(std::max(x, K_SECTION_PAD_X), y));
             ImGui::PushID(i);
 
-            if (RenderSlotButton("##slot", labels[i], state.container_filled[i], kSlotCellWidth))
+            if (renderSlotButton("##slot", labels[i], state_.container_filled[i],
+                                 K_SLOT_CELL_WIDTH))
             {
                 action = actions[i];
             }
@@ -257,31 +221,32 @@ ScienceView::Action ScienceView::RenderContainersSection(const State& state, flo
     return action;
 }
 
-ScienceView::Action ScienceView::RenderDrillSection(const DrillTelemetry& drill, float width) const
+ScienceView::action_E ScienceView::renderDrillSection(const drillTelemetry_S& drill,
+                                                      float width) const
 {
-    Action action = Action::None;
+    action_E action = action_E::None;
 
     if (ImGui::BeginChild("DrillSection", ImVec2(width, 0.0f), false, kNoScrollNoBgFlags))
     {
-        constexpr float value_column_width = 80.0f;
-        constexpr float min_value_offset = 75.0f;
-        constexpr float button_gap = 10.0f;
+        constexpr float VALUE_COLUMN_WIDTH = 80.0f;
+        constexpr float MIN_VALUE_OFFSET = 75.0f;
+        constexpr float BUTTON_GAP = 10.0f;
 
-        const float inner_width = Max(width - kSectionPadX * 2.0f, 1.0f);
+        const float inner_width = std::max(width - K_SECTION_PAD_X * 2.0f, 1.0f);
 
-        ImGui::SetCursorPosX(kSectionPadX);
+        ImGui::SetCursorPosX(K_SECTION_PAD_X);
         ImGui::TextColored(K_SECTION_TEXT, "DRILL CONTROL");
         ImGui::Spacing();
 
-        float value_x = width - kSectionPadX - value_column_width;
-        value_x = Max(value_x, kSectionPadX + min_value_offset);
+        float value_x = width - K_SECTION_PAD_X - VALUE_COLUMN_WIDTH;
+        value_x = std::max(value_x, K_SECTION_PAD_X + MIN_VALUE_OFFSET);
 
-        ImGui::SetCursorPosX(kSectionPadX);
+        ImGui::SetCursorPosX(K_SECTION_PAD_X);
         ImGui::Text("STATE:");
         ImGui::SameLine(value_x);
-        ImGui::TextColored(kDrillStateText, "%s", ToString(drill.state));
+        ImGui::TextColored(K_DRILL_STATE_TEXT, "%s", toString(drill.state));
 
-        ImGui::SetCursorPosX(kSectionPadX);
+        ImGui::SetCursorPosX(K_SECTION_PAD_X);
         ImGui::Text("DEPTH:");
         ImGui::SameLine(value_x);
         ImGui::Text("%.0f cm", drill.depth_cm);
@@ -289,20 +254,22 @@ ScienceView::Action ScienceView::RenderDrillSection(const DrillTelemetry& drill,
         ImGui::Spacing();
         ImGui::Spacing();
 
-        const float button_width = Max((inner_width - button_gap) * 0.5f, 1.0f);
+        const float button_width = std::max((inner_width - BUTTON_GAP) * 0.5f, 1.0f);
 
-        ImGui::SetCursorPosX(kSectionPadX);
+        ImGui::SetCursorPosX(K_SECTION_PAD_X);
 
-        if (ColoredButton("START", ImVec2(button_width, 40.0f), kStartButton, kStartButtonHover))
+        if (renderColoredButton("START", ImVec2(button_width, 40.0f), K_START_BUTTON,
+                                K_START_BUTTON_HOVER))
         {
-            action = Action::DrillStart;
+            action = action_E::DrillStart;
         }
 
-        ImGui::SameLine(0.0f, button_gap);
+        ImGui::SameLine(0.0f, BUTTON_GAP);
 
-        if (ColoredButton("STOP", ImVec2(button_width, 40.0f), kStopButton, kStopButtonHover))
+        if (renderColoredButton("STOP", ImVec2(button_width, 40.0f), K_STOP_BUTTON,
+                                K_STOP_BUTTON_HOVER))
         {
-            action = Action::DrillStop;
+            action = action_E::DrillStop;
         }
     }
 
@@ -311,14 +278,14 @@ ScienceView::Action ScienceView::RenderDrillSection(const DrillTelemetry& drill,
     return action;
 }
 
-void ScienceView::RenderScaleSection(float scale_weight_g, float width) const
+void ScienceView::renderScaleSection(float scale_weight_g, float width) const
 {
     if (ImGui::BeginChild("ScaleSection", ImVec2(width, 0.0f), false, kNoScrollNoBgFlags))
     {
         const float text_height = ImGui::GetTextLineHeight();
-        const float y = Max((ImGui::GetWindowHeight() - text_height) * 0.5f, 0.0f);
+        const float y = std::max((ImGui::GetWindowHeight() - text_height) * 0.5f, 0.0f);
 
-        ImGui::SetCursorPos(ImVec2(kSectionPadX, y));
+        ImGui::SetCursorPos(ImVec2(K_SECTION_PAD_X, y));
 
         ImGui::TextColored(K_SECTION_TEXT, "SCALE:");
         ImGui::SameLine();
@@ -328,21 +295,21 @@ void ScienceView::RenderScaleSection(float scale_weight_g, float width) const
     ImGui::EndChild();
 }
 
-void ScienceView::RenderRightColumn(const State& state, float width) const
+void ScienceView::renderRightColumn(float width) const
 {
-    ImGui::PushStyleColor(ImGuiCol_ChildBg, kPanelBg);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(kOuterPadX, kOuterPadY));
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, K_PANEL_BG);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(K_OUTER_PAD_X, K_OUTER_PAD_Y));
 
     if (ImGui::BeginChild("RightColumn", ImVec2(width, 0.0f), true, kNoScrollFlags))
     {
         ImGui::TextColored(K_TITLE_TEXT, "SENSORS & KINEMATICS");
         ImGui::Dummy(ImVec2(0.0f, 8.0f));
 
-        renderGpsCard(state.gps);
+        renderGpsCard(state_.gps);
 
         ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
-        RenderArmTelemetryCard(state.arm, state.gripper);
+        renderArmTelemetryCard(state_.arm, state_.gripper);
     }
 
     ImGui::EndChild();
@@ -351,94 +318,94 @@ void ScienceView::RenderRightColumn(const State& state, float width) const
     ImGui::PopStyleColor();
 }
 
-bool ScienceView::RenderSlotButton(const char* id, const char* label, bool is_filled,
+bool ScienceView::renderSlotButton(const char* pId, const char* pLabel, bool is_filled,
                                    float cell_width) const
 {
     ImGui::BeginGroup();
 
     const float start_x = ImGui::GetCursorPosX();
 
-    const float button_x = start_x + Max((cell_width - kSlotButtonSize) * 0.5f, 0.0f);
+    const float button_x = start_x + std::max((cell_width - K_SLOT_BUTTON_SIZE) * 0.5f, 0.0f);
 
     ImGui::SetCursorPosX(button_x);
 
-    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, kSlotButtonSize * 0.5f);
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, K_SLOT_BUTTON_SIZE * 0.5f);
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 2.0f);
 
-    ImGui::PushStyleColor(ImGuiCol_Button, is_filled ? kSlotGreenFilled : kTransparent);
+    ImGui::PushStyleColor(ImGuiCol_Button, is_filled ? K_SLOT_GREEN_FILLED : K_TRANSPARENT);
 
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, kSlotGreenHover);
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, kSlotGreen);
-    ImGui::PushStyleColor(ImGuiCol_Border, kSlotGreen);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, K_SLOT_GREEN_HOVER);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, K_SLOT_GREEN);
+    ImGui::PushStyleColor(ImGuiCol_Border, K_SLOT_GREEN);
 
-    const bool clicked = ImGui::Button(id, ImVec2(kSlotButtonSize, kSlotButtonSize));
+    const bool clicked = ImGui::Button(pId, ImVec2(K_SLOT_BUTTON_SIZE, K_SLOT_BUTTON_SIZE));
     const ImVec2 btn_min = ImGui::GetItemRectMin();
     const ImVec2 btn_max = ImGui::GetItemRectMax();
 
     ImGui::PopStyleColor(4);
     ImGui::PopStyleVar(2);
 
-    ImDrawList* draw_list = ImGui::GetWindowDrawList();
-    const char* slot_icon = ICON_FA_VIAL;
+    ImDrawList* pDraw_list = ImGui::GetWindowDrawList();
+    const char* pSlot_icon = ICON_FA_VIAL;
     constexpr float ICON_CENTER_COMPENSATION_X = 3.0f;
-    const ImVec2 icon_size = ImGui::CalcTextSize(slot_icon);
+    const ImVec2 icon_size = ImGui::CalcTextSize(pSlot_icon);
     const float icon_x =
         btn_min.x + (btn_max.x - btn_min.x - icon_size.x) * 0.5f + ICON_CENTER_COMPENSATION_X;
     const float icon_y = btn_min.y + (btn_max.y - btn_min.y - icon_size.y) * 0.5f;
-    const ImVec4 icon_color = is_filled ? kSlotGreen : K_MUTED_TEXT;
-    draw_list->AddText(ImVec2(icon_x, icon_y), ImGui::GetColorU32(icon_color), slot_icon);
+    const ImVec4 icon_color = is_filled ? K_SLOT_GREEN : K_MUTED_TEXT;
+    pDraw_list->AddText(ImVec2(icon_x, icon_y), ImGui::GetColorU32(icon_color), pSlot_icon);
 
-    const ImVec2 text_size = ImGui::CalcTextSize(label);
+    const ImVec2 text_size = ImGui::CalcTextSize(pLabel);
 
-    const float text_x = start_x + Max((cell_width - text_size.x) * 0.5f, 0.0f);
+    const float text_x = start_x + std::max((cell_width - text_size.x) * 0.5f, 0.0f);
 
     ImGui::SetCursorPosX(text_x);
-    ImGui::TextColored(K_SECTION_TEXT, "%s", label);
+    ImGui::TextColored(K_SECTION_TEXT, "%s", pLabel);
 
     ImGui::EndGroup();
 
     return clicked;
 }
 
-void ScienceView::RenderArmTelemetryCard(const armTelemetry_S& arm,
+void ScienceView::renderArmTelemetryCard(const armTelemetry_S& arm,
                                          const gripperTelemetry_S& gripper) const
 {
     if (beginCard("ArmCard", ImVec2(0.0f, 0.0f)))
     {
         drawHeader("ARM TELEMETRY");
 
-        struct FloatRow
+        struct floatRow_S
         {
-            const char* label;
+            const char* pLabel;
             float value;
         };
 
-        const FloatRow joints[] = {{"BASE:", arm.base_deg},
-                                   {"SHOULDER:", arm.shoulder_deg},
-                                   {"ELBOW:", arm.elbow_deg},
-                                   {"WRIST PITCH:", arm.wrist_pitch_deg},
-                                   {"WRIST ROLL:", arm.wrist_roll_deg}};
+        const floatRow_S joints[] = {{"BASE:", arm.base_deg},
+                                     {"SHOULDER:", arm.shoulder_deg},
+                                     {"ELBOW:", arm.elbow_deg},
+                                     {"WRIST PITCH:", arm.wrist_pitch_deg},
+                                     {"WRIST ROLL:", arm.wrist_roll_deg}};
 
         ImGui::SetCursorPosX(K_CARD_PAD_X);
         ImGui::TextColored(K_MUTED_TEXT, "JOINT ANGLES");
         ImGui::Dummy(ImVec2(0.0f, 4.0f));
 
-        for (const FloatRow& row : joints)
+        for (const floatRow_S& row : joints)
         {
-            valueRow(K_LABEL_X, K_VALUE_X, K_BLUE, row.label, "%.0f°", row.value);
+            valueRow(K_LABEL_X, K_VALUE_X, K_BLUE, row.pLabel, "%.0f°", row.value);
         }
 
         View::innerSeparator();
 
-        const FloatRow position[] = {{"X:", arm.ee_x_m}, {"Y:", arm.ee_y_m}, {"Z:", arm.ee_z_m}};
+        const floatRow_S position[] = {{"X:", arm.ee_x_m}, {"Y:", arm.ee_y_m}, {"Z:", arm.ee_z_m}};
 
         ImGui::SetCursorPosX(K_CARD_PAD_X);
         ImGui::TextColored(K_MUTED_TEXT, "END-EFFECTOR POSITION");
         ImGui::Dummy(ImVec2(0.0f, 4.0f));
 
-        for (const FloatRow& row : position)
+        for (const floatRow_S& row : position)
         {
-            valueRow(K_LABEL_X, K_VALUE_X, K_PURPLE, row.label, "%.2f m", row.value);
+            valueRow(K_LABEL_X, K_VALUE_X, K_PURPLE, row.pLabel, "%.2f m", row.value);
         }
 
         View::innerSeparator();
@@ -447,7 +414,7 @@ void ScienceView::RenderArmTelemetryCard(const armTelemetry_S& arm,
         ImGui::TextColored(K_MUTED_TEXT, "GRIPPER STATE");
         ImGui::Dummy(ImVec2(0.0f, 4.0f));
 
-        valueRow(K_LABEL_X, K_VALUE_X, K_GREEN, "STATE:", "%s", ToString(gripper.state));
+        valueRow(K_LABEL_X, K_VALUE_X, K_GREEN, "STATE:", "%s", toString(gripper.state));
 
         valueRow(K_LABEL_X, K_VALUE_X, K_ORANGE, "FORCE:", "%.0f N", gripper.force_n);
     }
@@ -455,24 +422,24 @@ void ScienceView::RenderArmTelemetryCard(const armTelemetry_S& arm,
     endCard();
 }
 
-const char* ScienceView::ToString(DrillState state) noexcept
+const char* ScienceView::toString(drillState_E state) noexcept
 {
     switch (state)
     {
-    case DrillState::Idle:
+    case drillState_E::Idle:
         return "IDLE";
 
-    case DrillState::Running:
+    case drillState_E::Running:
         return "RUNNING";
 
-    case DrillState::Error:
+    case drillState_E::Error:
         return "ERROR";
     }
 
     return "UNKNOWN";
 }
 
-const char* ScienceView::ToString(gripperState_E state) noexcept
+const char* ScienceView::toString(gripperState_E state) noexcept
 {
     switch (state)
     {

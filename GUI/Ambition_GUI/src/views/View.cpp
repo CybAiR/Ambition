@@ -33,6 +33,20 @@ void View::innerSeparator() const
     ImGui::Dummy(ImVec2(0.0f, 10.0f));
 }
 
+bool View::renderColoredButton(const char* label, const ImVec2& size, const ImVec4& base_color,
+                               const ImVec4& hover_color) const
+{
+    ImGui::PushStyleColor(ImGuiCol_Button, base_color);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, hover_color);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, base_color);
+
+    const bool clicked = ImGui::Button(label, size);
+
+    ImGui::PopStyleColor(3);
+
+    return clicked;
+}
+
 bool View::renderCameraContainer(float height, const char* title, bool is_screenshot_enabled,
                                  bool is_fullscreen_button_enabled, bool is_fullscreen_active) const
 {

@@ -21,11 +21,10 @@ int main(int argc, char* argv[])
 
     ImFont* main_font = io.Fonts->AddFontFromFileTTF("../misc/fonts/Roboto-Medium.ttf", 15.0f);
 
-    // Merge FA into main_font immediately after
     ImFontConfig icon_config;
     icon_config.MergeMode = true;
     icon_config.PixelSnapH = true;
-    icon_config.GlyphOffset = ImVec2(-3.0f, 1.0f); // nudge down, adjust value to taste
+    icon_config.GlyphOffset = ImVec2(-3.0f, 1.0f);
     static const ImWchar icon_ranges[] = {ICON_MIN_FA, ICON_MAX_FA, 0};
     io.Fonts->AddFontFromFileTTF("../misc/fonts/fa-solid-900.otf", 15.0f, &icon_config,
                                  icon_ranges);
@@ -55,11 +54,8 @@ int main(int argc, char* argv[])
 
     Views active_view = Views::Science;
     ScienceView science_view;
-    // ScienceView science_view;
     NavigationView navigation_view;
-    // ScienceView science_view;
     MaintenanceView maintenance_view;
-    // ScienceView science_view;
     ProbingView probing_view;
 
     bool done = false;
@@ -110,7 +106,7 @@ int main(int argc, char* argv[])
         switch (active_view)
         {
         case Views::Science:
-            science_view.Render();
+            science_view.render();
             break;
         case Views::Navigation:
             navigation_view.render();
