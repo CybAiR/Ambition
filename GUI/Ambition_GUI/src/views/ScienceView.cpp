@@ -159,7 +159,7 @@ ScienceView::Action ScienceView::RenderBottomPanel(const State& state) const
         // Changed to use the base View DrawHeader signature
         drawHeader("SAMPLE DATA");
 
-        ImGui::SetCursorPos(ImVec2(0.0f, kHeaderHeight + 6.0f));
+        ImGui::SetCursorPos(ImVec2(0.0f, K_HEADER_HEIGHT + 6.0f));
 
         const ImVec2 region = ImGui::GetContentRegionAvail();
         const ImVec2 content_pos = ImGui::GetCursorScreenPos();
@@ -168,7 +168,7 @@ ScienceView::Action ScienceView::RenderBottomPanel(const State& state) const
         const float last_section_width = Max(region.x - section_width * 2.0f, 1.0f);
 
         ImDrawList* draw_list = ImGui::GetWindowDrawList();
-        const ImU32 line_color = ImGui::GetColorU32(kBorder);
+        const ImU32 line_color = ImGui::GetColorU32(K_BORDER);
 
         draw_list->AddLine(ImVec2(content_pos.x + section_width, content_pos.y),
                            ImVec2(content_pos.x + section_width, content_pos.y + region.y),
@@ -208,7 +208,7 @@ ScienceView::Action ScienceView::RenderContainersSection(const State& state, flo
         constexpr float row_gap = 4.0f;
 
         ImGui::SetCursorPosX(kSectionPadX);
-        ImGui::TextColored(kSectionText, "CONTAINERS");
+        ImGui::TextColored(K_SECTION_TEXT, "CONTAINERS");
 
         const float inner_width = Max(width - kSectionPadX * 2.0f, 1.0f);
         const float text_height = ImGui::GetTextLineHeight();
@@ -270,7 +270,7 @@ ScienceView::Action ScienceView::RenderDrillSection(const DrillTelemetry& drill,
         const float inner_width = Max(width - kSectionPadX * 2.0f, 1.0f);
 
         ImGui::SetCursorPosX(kSectionPadX);
-        ImGui::TextColored(kSectionText, "DRILL CONTROL");
+        ImGui::TextColored(K_SECTION_TEXT, "DRILL CONTROL");
         ImGui::Spacing();
 
         float value_x = width - kSectionPadX - value_column_width;
@@ -320,7 +320,7 @@ void ScienceView::RenderScaleSection(float scale_weight_g, float width) const
 
         ImGui::SetCursorPos(ImVec2(kSectionPadX, y));
 
-        ImGui::TextColored(kSectionText, "SCALE:");
+        ImGui::TextColored(K_SECTION_TEXT, "SCALE:");
         ImGui::SameLine();
         ImGui::Text("%.1f g", scale_weight_g);
     }
@@ -335,7 +335,7 @@ void ScienceView::RenderRightColumn(const State& state, float width) const
 
     if (ImGui::BeginChild("RightColumn", ImVec2(width, 0.0f), true, kNoScrollFlags))
     {
-        ImGui::TextColored(kTitleText, "SENSORS & KINEMATICS");
+        ImGui::TextColored(K_TITLE_TEXT, "SENSORS & KINEMATICS");
         ImGui::Dummy(ImVec2(0.0f, 8.0f));
 
         renderGpsCard(state.gps);
@@ -385,7 +385,7 @@ bool ScienceView::RenderSlotButton(const char* id, const char* label, bool is_fi
     const float icon_x =
         btn_min.x + (btn_max.x - btn_min.x - icon_size.x) * 0.5f + ICON_CENTER_COMPENSATION_X;
     const float icon_y = btn_min.y + (btn_max.y - btn_min.y - icon_size.y) * 0.5f;
-    const ImVec4 icon_color = is_filled ? kSlotGreen : kMutedText;
+    const ImVec4 icon_color = is_filled ? kSlotGreen : K_MUTED_TEXT;
     draw_list->AddText(ImVec2(icon_x, icon_y), ImGui::GetColorU32(icon_color), slot_icon);
 
     const ImVec2 text_size = ImGui::CalcTextSize(label);
@@ -393,7 +393,7 @@ bool ScienceView::RenderSlotButton(const char* id, const char* label, bool is_fi
     const float text_x = start_x + Max((cell_width - text_size.x) * 0.5f, 0.0f);
 
     ImGui::SetCursorPosX(text_x);
-    ImGui::TextColored(kSectionText, "%s", label);
+    ImGui::TextColored(K_SECTION_TEXT, "%s", label);
 
     ImGui::EndGroup();
 
@@ -419,37 +419,37 @@ void ScienceView::RenderArmTelemetryCard(const armTelemetry_S& arm,
                                    {"WRIST PITCH:", arm.wrist_pitch_deg},
                                    {"WRIST ROLL:", arm.wrist_roll_deg}};
 
-        ImGui::SetCursorPosX(kCardPadX);
-        ImGui::TextColored(kMutedText, "JOINT ANGLES");
+        ImGui::SetCursorPosX(K_CARD_PAD_X);
+        ImGui::TextColored(K_MUTED_TEXT, "JOINT ANGLES");
         ImGui::Dummy(ImVec2(0.0f, 4.0f));
 
         for (const FloatRow& row : joints)
         {
-            valueRow(kLabelX, kValueX, kBlue, row.label, "%.0f°", row.value);
+            valueRow(K_LABEL_X, K_VALUE_X, K_BLUE, row.label, "%.0f°", row.value);
         }
 
         View::innerSeparator();
 
         const FloatRow position[] = {{"X:", arm.ee_x_m}, {"Y:", arm.ee_y_m}, {"Z:", arm.ee_z_m}};
 
-        ImGui::SetCursorPosX(kCardPadX);
-        ImGui::TextColored(kMutedText, "END-EFFECTOR POSITION");
+        ImGui::SetCursorPosX(K_CARD_PAD_X);
+        ImGui::TextColored(K_MUTED_TEXT, "END-EFFECTOR POSITION");
         ImGui::Dummy(ImVec2(0.0f, 4.0f));
 
         for (const FloatRow& row : position)
         {
-            valueRow(kLabelX, kValueX, kPurple, row.label, "%.2f m", row.value);
+            valueRow(K_LABEL_X, K_VALUE_X, K_PURPLE, row.label, "%.2f m", row.value);
         }
 
         View::innerSeparator();
 
-        ImGui::SetCursorPosX(kCardPadX);
-        ImGui::TextColored(kMutedText, "GRIPPER STATE");
+        ImGui::SetCursorPosX(K_CARD_PAD_X);
+        ImGui::TextColored(K_MUTED_TEXT, "GRIPPER STATE");
         ImGui::Dummy(ImVec2(0.0f, 4.0f));
 
-        valueRow(kLabelX, kValueX, kGreen, "STATE:", "%s", ToString(gripper.state));
+        valueRow(K_LABEL_X, K_VALUE_X, K_GREEN, "STATE:", "%s", ToString(gripper.state));
 
-        valueRow(kLabelX, kValueX, kOrange, "FORCE:", "%.0f N", gripper.force_n);
+        valueRow(K_LABEL_X, K_VALUE_X, K_ORANGE, "FORCE:", "%.0f N", gripper.force_n);
     }
 
     endCard();

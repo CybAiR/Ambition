@@ -48,8 +48,8 @@ void ProbingView::innerSeparator() const
     const ImVec2 size = ImGui::GetWindowSize();
     const float y = ImGui::GetCursorScreenPos().y;
 
-    draw_list->AddLine(ImVec2(pos.x + kCardPadX, y), ImVec2(pos.x + size.x - kCardPadX, y),
-                       ImGui::GetColorU32(kBorder));
+    draw_list->AddLine(ImVec2(pos.x + K_CARD_PAD_X, y), ImVec2(pos.x + size.x - K_CARD_PAD_X, y),
+                       ImGui::GetColorU32(K_BORDER));
 
     ImGui::Dummy(ImVec2(0.0f, 10.0f));
 }
@@ -155,37 +155,37 @@ void ProbingView::renderArmTelemetryCard(const armTelemetry_S& arm,
                                      {"WRIST PITCH:", arm.wrist_pitch_deg},
                                      {"WRIST ROLL:", arm.wrist_roll_deg}};
 
-        ImGui::SetCursorPosX(kCardPadX);
-        ImGui::TextColored(kMutedText, "JOINT ANGLES");
+        ImGui::SetCursorPosX(K_CARD_PAD_X);
+        ImGui::TextColored(K_MUTED_TEXT, "JOINT ANGLES");
         ImGui::Dummy(ImVec2(0.0f, 4.0f));
 
         for (const floatRow_S& row : joints)
         {
-            valueRow(kLabelX, kValueX, kBlue, row.label, "%.0f°", row.value);
+            valueRow(K_LABEL_X, K_VALUE_X, K_BLUE, row.label, "%.0f°", row.value);
         }
 
         innerSeparator();
 
         const floatRow_S position[] = {{"X:", arm.ee_x_m}, {"Y:", arm.ee_y_m}, {"Z:", arm.ee_z_m}};
 
-        ImGui::SetCursorPosX(kCardPadX);
-        ImGui::TextColored(kMutedText, "END-EFFECTOR POSITION");
+        ImGui::SetCursorPosX(K_CARD_PAD_X);
+        ImGui::TextColored(K_MUTED_TEXT, "END-EFFECTOR POSITION");
         ImGui::Dummy(ImVec2(0.0f, 4.0f));
 
         for (const floatRow_S& row : position)
         {
-            valueRow(kLabelX, kValueX, kPurple, row.label, "%.2f m", row.value);
+            valueRow(K_LABEL_X, K_VALUE_X, K_PURPLE, row.label, "%.2f m", row.value);
         }
 
         innerSeparator();
 
-        ImGui::SetCursorPosX(kCardPadX);
-        ImGui::TextColored(kMutedText, "GRIPPER STATE");
+        ImGui::SetCursorPosX(K_CARD_PAD_X);
+        ImGui::TextColored(K_MUTED_TEXT, "GRIPPER STATE");
         ImGui::Dummy(ImVec2(0.0f, 4.0f));
 
-        valueRow(kLabelX, kValueX, kGreen, "STATE:", "%s", toString(gripper.state));
+        valueRow(K_LABEL_X, K_VALUE_X, K_GREEN, "STATE:", "%s", toString(gripper.state));
 
-        valueRow(kLabelX, kValueX, kOrange, "FORCE:", "%.0f N", gripper.force_n);
+        valueRow(K_LABEL_X, K_VALUE_X, K_ORANGE, "FORCE:", "%.0f N", gripper.force_n);
     }
 
     endCard();
@@ -199,10 +199,10 @@ void ProbingView::renderMissionProgressCard(const missionProgress_S& mission) co
 
         ImGui::Dummy(ImVec2(0.0f, 4.0f));
 
-        float avail_width = ImGui::GetContentRegionAvail().x - kCardPadX - 12.0f;
-        ImGui::SetCursorPosX(kCardPadX);
+        float avail_width = ImGui::GetContentRegionAvail().x - K_CARD_PAD_X - 12.0f;
+        ImGui::SetCursorPosX(K_CARD_PAD_X);
 
-        ImGui::PushStyleColor(ImGuiCol_Border, kBorder);
+        ImGui::PushStyleColor(ImGuiCol_Border, K_BORDER);
         ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
 
         if (ImGui::BeginChild("ProgressBox", ImVec2(avail_width, 60.0f), true,
@@ -210,10 +210,10 @@ void ProbingView::renderMissionProgressCard(const missionProgress_S& mission) co
         {
 
             ImGui::SetCursorPos(ImVec2(10.0f, 10.0f));
-            ImGui::TextColored(kMutedText, "PROBES COLLECTED");
+            ImGui::TextColored(K_MUTED_TEXT, "PROBES COLLECTED");
 
             ImGui::SetCursorPos(ImVec2(10.0f, 35.0f));
-            ImGui::TextColored(kGreen, "TARGET: %d", mission.target);
+            ImGui::TextColored(K_GREEN, "TARGET: %d", mission.target);
 
             float old_scale = ImGui::GetFont()->Scale;
             ImGui::SetWindowFontScale(3.0f);
@@ -226,7 +226,7 @@ void ProbingView::renderMissionProgressCard(const missionProgress_S& mission) co
             float text_y = (ImGui::GetWindowHeight() - text_size.y) * 0.5f;
 
             ImGui::SetCursorPos(ImVec2(text_x, text_y));
-            ImGui::TextColored(kGreen, "%s", num_buf);
+            ImGui::TextColored(K_GREEN, "%s", num_buf);
 
             ImGui::SetWindowFontScale(old_scale);
         }
@@ -235,7 +235,7 @@ void ProbingView::renderMissionProgressCard(const missionProgress_S& mission) co
 
         ImGui::Dummy(ImVec2(0.0f, 8.0f));
 
-        ImGui::SetCursorPosX(kCardPadX);
+        ImGui::SetCursorPosX(K_CARD_PAD_X);
         float gap = ImGui::GetStyle().ItemSpacing.x;
         float btn_width = (avail_width - gap) * 0.5f;
 

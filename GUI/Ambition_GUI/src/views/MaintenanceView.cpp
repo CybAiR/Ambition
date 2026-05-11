@@ -29,8 +29,8 @@ void MaintenanceView::innerSeparator() const
     const ImVec2 size = ImGui::GetWindowSize();
     const float y = ImGui::GetCursorScreenPos().y;
 
-    draw_list->AddLine(ImVec2(pos.x + kCardPadX, y), ImVec2(pos.x + size.x - kCardPadX, y),
-                       ImGui::GetColorU32(kBorder) // kBorder comes from View.h
+    draw_list->AddLine(ImVec2(pos.x + K_CARD_PAD_X, y), ImVec2(pos.x + size.x - K_CARD_PAD_X, y),
+                       ImGui::GetColorU32(K_BORDER) // kBorder comes from View.h
     );
 
     ImGui::Dummy(ImVec2(0.0f, 10.0f));
@@ -105,7 +105,7 @@ void MaintenanceView::renderRightColumn(float width) const
 
     if (ImGui::BeginChild("RightColumn", ImVec2(width, 0.0f), true, kNoScrollFlags))
     {
-        ImGui::TextColored(kTitleText, "ARM CONTROL & DIAGNOSTICS");
+        ImGui::TextColored(K_TITLE_TEXT, "ARM CONTROL & DIAGNOSTICS");
         ImGui::Dummy(ImVec2(0.0f, 8.0f));
 
         renderArmTelemetryCard(state_.arm, state_.gripper);
@@ -139,37 +139,37 @@ void MaintenanceView::renderArmTelemetryCard(const armTelemetry_S& arm,
                                      {"WRIST PITCH:", arm.wrist_pitch_deg},
                                      {"WRIST ROLL:", arm.wrist_roll_deg}};
 
-        ImGui::SetCursorPosX(kCardPadX);
-        ImGui::TextColored(kMutedText, "JOINT ANGLES");
+        ImGui::SetCursorPosX(K_CARD_PAD_X);
+        ImGui::TextColored(K_MUTED_TEXT, "JOINT ANGLES");
         ImGui::Dummy(ImVec2(0.0f, 4.0f));
 
         for (const floatRow_S& row : joints)
         {
-            valueRow(kLabelX, kValueX, kBlue, row.label, "%.0f°", row.value);
+            valueRow(K_LABEL_X, K_VALUE_X, K_BLUE, row.label, "%.0f°", row.value);
         }
 
         innerSeparator();
 
         const floatRow_S position[] = {{"X:", arm.ee_x_m}, {"Y:", arm.ee_y_m}, {"Z:", arm.ee_z_m}};
 
-        ImGui::SetCursorPosX(kCardPadX);
-        ImGui::TextColored(kMutedText, "END-EFFECTOR POSITION");
+        ImGui::SetCursorPosX(K_CARD_PAD_X);
+        ImGui::TextColored(K_MUTED_TEXT, "END-EFFECTOR POSITION");
         ImGui::Dummy(ImVec2(0.0f, 4.0f));
 
         for (const floatRow_S& row : position)
         {
-            valueRow(kLabelX, kValueX, kPurple, row.label, "%.2f m", row.value);
+            valueRow(K_LABEL_X, K_VALUE_X, K_PURPLE, row.label, "%.2f m", row.value);
         }
 
         innerSeparator();
 
-        ImGui::SetCursorPosX(kCardPadX);
-        ImGui::TextColored(kMutedText, "GRIPPER STATE");
+        ImGui::SetCursorPosX(K_CARD_PAD_X);
+        ImGui::TextColored(K_MUTED_TEXT, "GRIPPER STATE");
         ImGui::Dummy(ImVec2(0.0f, 4.0f));
 
-        valueRow(kLabelX, kValueX, kGreen, "STATE:", "%s", toString(gripper.state));
+        valueRow(K_LABEL_X, K_VALUE_X, K_GREEN, "STATE:", "%s", toString(gripper.state));
 
-        valueRow(kLabelX, kValueX, kOrange, "FORCE:", "%.0f N", gripper.force_n);
+        valueRow(K_LABEL_X, K_VALUE_X, K_ORANGE, "FORCE:", "%.0f N", gripper.force_n);
     }
 
     endCard();
@@ -199,11 +199,11 @@ void MaintenanceView::renderJointDiagnostics(const jointDiagnostics_S& joints) c
 
         for (const auto& row : rows)
         {
-            ImGui::SetCursorPosX(kCardPadX);
-            ImGui::TextColored(kTitleText, "%s", row.label);
+            ImGui::SetCursorPosX(K_CARD_PAD_X);
+            ImGui::TextColored(K_TITLE_TEXT, "%s", row.label);
 
             ImGui::SameLine(temp_x);
-            const ImVec4 temp_color = (row.temp >= 65.0f) ? K_WARNING_RED : kMutedText;
+            const ImVec4 temp_color = (row.temp >= 65.0f) ? K_WARNING_RED : K_MUTED_TEXT;
 
             ImGui::TextColored(temp_color, u8"%.0f°C", row.temp);
 
