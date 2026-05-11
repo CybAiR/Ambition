@@ -58,6 +58,8 @@ int main(int argc, char* argv[])
     MaintenanceView maintenance_view;
     ProbingView probing_view;
 
+    TopPanel::mode_E current_mode = TopPanel::mode_E::DRIVE;
+
     bool done = false;
     while (!done)
     {
@@ -88,7 +90,7 @@ int main(int argc, char* argv[])
                                            ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse;
 
         TopPanel top_panel(viewport->WorkSize.x, top_panel_flags);
-        top_panel.render(viewport);
+        top_panel.render(viewport, current_mode);
 
         SidePanel side_panel(side_panel_flags);
         side_panel.render(viewport, active_view);

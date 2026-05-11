@@ -64,7 +64,7 @@ class NavigationView : public View
     void renderStatus();
     void renderEstimatedKinematics() const;
     void renderWaypointEditor();
-    void InnerSeparator() const;
+    void innerSeparator() const;
 
     static const char* toString(statusState_E state);
     static const char* toString(waypointState_E state);

@@ -35,7 +35,7 @@ const ImVec4 K_BUTTON_HOVER = ImVec4(0.30f, 0.30f, 0.30f, 1.0f);
 const ImVec4 K_PANEL_BG = ImVec4(0.08f, 0.08f, 0.08f, 1.0f);
 } // namespace
 
-void NavigationView::InnerSeparator() const
+void NavigationView::innerSeparator() const
 {
     ImGui::Dummy(ImVec2(0.0f, 6.0f));
     ImDrawList* pDraw_list = ImGui::GetWindowDrawList();
@@ -258,7 +258,7 @@ void NavigationView::renderEstimatedKinematics() const
         ImGui::EndChild();
         ImGui::PopStyleColor();
 
-        InnerSeparator();
+        innerSeparator();
 
         ImGui::SetCursorPosX(K_CARD_PAD_X);
         ImGui::TextColored(K_TITLE_TEXT, "GPS / ODOMETRY");

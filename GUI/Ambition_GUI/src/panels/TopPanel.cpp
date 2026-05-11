@@ -10,7 +10,7 @@ TopPanel::TopPanel(float width, ImGuiWindowFlags top_panel_flags)
     top_panel_flags_ = top_panel_flags;
 }
 
-void TopPanel::generateViewText(std::string text) const
+void TopPanel::generateViewText(std::string text)
 {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 2.0f);
     ImGui::PushStyleColor(ImGuiCol_Button, bg_color_);
@@ -44,7 +44,7 @@ void TopPanel::generateViewText(std::string text) const
     ImGui::SameLine();
 }
 
-void TopPanel::generateEStop(const ImGuiViewport* viewport) const
+void TopPanel::generateEStop(const ImGuiViewport* viewport)
 {
     float absolute_center_x = (viewport->WorkSize.x - e_stop_width_) * 0.5f;
     float cursor_x = absolute_center_x - (start_x_);
@@ -69,7 +69,7 @@ void TopPanel::generateEStop(const ImGuiViewport* viewport) const
     ImGui::SameLine();
 }
 
-void TopPanel::generateSpeedView(const ImGuiViewport* viewport) const
+void TopPanel::generateSpeedView(const ImGuiViewport* viewport)
 {
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
     float cursor_x = viewport->WorkSize.x - start_x_ - 300.0f;
@@ -103,23 +103,38 @@ void TopPanel::generateSpeedView(const ImGuiViewport* viewport) const
 
     ImGui::SetCursorPosX(next_button_pos.x);
     ImGui::SetCursorPosY(0.0f);
+
+    ImGui::PopStyleVar(1);
 }
 
-void TopPanel::generateDriveBtn(const ImGuiViewport* viewport) const
+void TopPanel::generateModeBtn(mode_E& current_mode)
 {
+    const bool is_drive = (current_mode == mode_E::DRIVE);
 
-    ImGui::PushStyleColor(ImGuiCol_Button, drive_btn_color_);
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, drive_btn_hover_color_);
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, drive_btn_hover_color_);
-    ImGui::PushStyleColor(ImGuiCol_Text, drive_text_color_);
+    if (is_drive)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Button, drive_btn_color_);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, drive_btn_hover_color_);
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, drive_btn_hover_color_);
+        ImGui::PushStyleColor(ImGuiCol_Text, drive_text_color_);
+    }
+    else
+    {
+        ImGui::PushStyleColor(ImGuiCol_Button, arm_btn_color_);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, arm_btn_hover_color_);
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, arm_btn_hover_color_);
+        ImGui::PushStyleColor(ImGuiCol_Text, arm_text_color_);
+    }
 
-    ImGui::Button(ICON_FA_GAMEPAD "DRIVE", ImVec2(drive_btn_width_, drive_btn_height_));
+    const char* label = is_drive ? ICON_FA_GAMEPAD "  DRIVE" : ICON_FA_HAND "  ARM";
+
+    if (ImGui::Button(label, ImVec2(drive_btn_width_, drive_btn_height_)))
+        current_mode = is_drive ? mode_E::ARM : mode_E::DRIVE;
 
     ImGui::PopStyleColor(4);
-    ImGui::PopStyleVar();
 }
 
-void TopPanel::render(const ImGuiViewport* viewport) const
+void TopPanel::render(const ImGuiViewport* viewport, mode_E& current_mode)
 {
     ImVec2 top_panel_pos(viewport->WorkPos.x + start_x_, viewport->WorkPos.y);
     ImVec2 top_panel_size(width_, height_);
@@ -133,13 +148,13 @@ void TopPanel::render(const ImGuiViewport* viewport) const
 
     ImGui::SetWindowFontScale(font_scale_);
 
-    TopPanel::generateViewText("Maintenance");
+    generateViewText("Maintenance");
 
-    TopPanel::generateEStop(viewport);
+    generateEStop(viewport);
 
-    TopPanel::generateSpeedView(viewport);
+    generateSpeedView(viewport);
 
-    TopPanel::generateDriveBtn(viewport);
+    generateModeBtn(current_mode);
 
     ImGui::End();
 
