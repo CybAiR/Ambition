@@ -9,6 +9,7 @@
 #include "fonts/IconsFontAwesome6.h"
 #include "views/MaintenanceView.h"
 #include "views/NavigationView.h"
+#include "views/ProbingView.h"
 #include "views/ScienceView.h"
 
 int main(int argc, char* argv[])
@@ -58,6 +59,8 @@ int main(int argc, char* argv[])
     NavigationView navigation_view;
     // ScienceView science_view;
     MaintenanceView maintenance_view;
+    // ScienceView science_view;
+    ProbingView probing_view;
 
     bool done = false;
     while (!done)
@@ -116,7 +119,7 @@ int main(int argc, char* argv[])
             maintenance_view.render();
             break;
         case Views::Probing:
-            ImGui::Text("Widok Probing (w budowie)");
+            probing_view.render();
             break;
         }
 
