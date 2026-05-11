@@ -22,7 +22,7 @@ class NavigationView : public View
     {
         float speed = 1.2f;
         int heading = 45;
-        GpsOdometry gps = {51.4883f, -0.1171f, 12.4f};
+        gpsOdometry_S gps = {51.4883f, -0.1171f, 12.4f};
     };
 
     struct waypoint_S

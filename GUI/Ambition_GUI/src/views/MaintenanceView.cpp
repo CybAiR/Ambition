@@ -82,7 +82,7 @@ void MaintenanceView::renderLeftColumn(float width)
         float camera_height = avail.y;
         camera_height = std::max(camera_height, 1.0f);
 
-        const bool is_fullscreen_toggled = RenderCameraContainer(
+        const bool is_fullscreen_toggled = renderCameraContainer(
             camera_height, "MAIN CAMERA (MAINTENANCE)", false, true, was_fullscreen);
 
         if (is_fullscreen_toggled)
@@ -120,12 +120,12 @@ void MaintenanceView::renderRightColumn(float width) const
     ImGui::PopStyleColor();
 }
 
-void MaintenanceView::renderArmTelemetryCard(const ArmTelemetry& arm,
-                                             const GripperTelemetry& gripper) const
+void MaintenanceView::renderArmTelemetryCard(const armTelemetry_S& arm,
+                                             const gripperTelemetry_S& gripper) const
 {
-    if (BeginCard("ArmCard", ImVec2(0.0f, 400.0f)))
+    if (beginCard("ArmCard", ImVec2(0.0f, 400.0f)))
     {
-        DrawHeader("ARM TELEMETRY");
+        drawHeader("ARM TELEMETRY");
 
         struct floatRow_S
         {
@@ -145,10 +145,10 @@ void MaintenanceView::renderArmTelemetryCard(const ArmTelemetry& arm,
 
         for (const floatRow_S& row : joints)
         {
-            ValueRow(kLabelX, kValueX, kBlue, row.label, "%.0f°", row.value);
+            valueRow(kLabelX, kValueX, kBlue, row.label, "%.0f°", row.value);
         }
 
-        InnerSeparator();
+        innerSeparator();
 
         const floatRow_S position[] = {{"X:", arm.ee_x_m}, {"Y:", arm.ee_y_m}, {"Z:", arm.ee_z_m}};
 
@@ -158,28 +158,28 @@ void MaintenanceView::renderArmTelemetryCard(const ArmTelemetry& arm,
 
         for (const floatRow_S& row : position)
         {
-            ValueRow(kLabelX, kValueX, kPurple, row.label, "%.2f m", row.value);
+            valueRow(kLabelX, kValueX, kPurple, row.label, "%.2f m", row.value);
         }
 
-        InnerSeparator();
+        innerSeparator();
 
         ImGui::SetCursorPosX(kCardPadX);
         ImGui::TextColored(kMutedText, "GRIPPER STATE");
         ImGui::Dummy(ImVec2(0.0f, 4.0f));
 
-        ValueRow(kLabelX, kValueX, kGreen, "STATE:", "%s", toString(gripper.state));
+        valueRow(kLabelX, kValueX, kGreen, "STATE:", "%s", toString(gripper.state));
 
-        ValueRow(kLabelX, kValueX, kOrange, "FORCE:", "%.0f N", gripper.force_n);
+        valueRow(kLabelX, kValueX, kOrange, "FORCE:", "%.0f N", gripper.force_n);
     }
 
-    EndCard();
+    endCard();
 }
 
 void MaintenanceView::renderJointDiagnostics(const jointDiagnostics_S& joints) const
 {
-    if (BeginCard("JointsCard", ImVec2(0.0f, 140.0f)))
+    if (beginCard("JointsCard", ImVec2(0.0f, 140.0f)))
     {
-        DrawHeader("JOINT DIAGNOSTICS");
+        drawHeader("JOINT DIAGNOSTICS");
 
         const float temp_x = ImGui::GetWindowWidth() - 140.0f;
         const float current_x = ImGui::GetWindowWidth() - 65.0f;
@@ -214,23 +214,23 @@ void MaintenanceView::renderJointDiagnostics(const jointDiagnostics_S& joints) c
         }
     }
 
-    EndCard();
+    endCard();
 }
 
-const char* MaintenanceView::toString(GripperState state)
+const char* MaintenanceView::toString(gripperState_E state)
 {
     switch (state)
     {
-    case GripperState::Open:
+    case gripperState_E::Open:
         return "OPEN";
 
-    case GripperState::Closed:
+    case gripperState_E::Closed:
         return "CLOSED";
 
-    case GripperState::Holding:
+    case gripperState_E::Holding:
         return "HOLDING";
 
-    case GripperState::Error:
+    case gripperState_E::Error:
         return "ERROR";
     }
 

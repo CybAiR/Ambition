@@ -129,13 +129,8 @@ ScienceView::Action ScienceView::RenderLeftColumn(const State& state, float widt
         float camera_height = was_fullscreen ? avail.y : (avail.y - kBottomPanelHeight - gap_y);
         camera_height = Max(camera_height, 1.0f);
 
-        const bool is_fullscreen_toggled = RenderCameraContainer(
-            camera_height,
-            "MAIN CAMERA (SCIENCE)",
-            true,
-            true,
-            was_fullscreen
-        );
+        const bool is_fullscreen_toggled = renderCameraContainer(
+            camera_height, "MAIN CAMERA (SCIENCE)", true, true, was_fullscreen);
 
         if (is_fullscreen_toggled)
         {
@@ -162,7 +157,7 @@ ScienceView::Action ScienceView::RenderBottomPanel(const State& state) const
     if (ImGui::BeginChild("BottomPanel", ImVec2(0.0f, kBottomPanelHeight), true, kNoScrollFlags))
     {
         // Changed to use the base View DrawHeader signature
-        DrawHeader("SAMPLE DATA");
+        drawHeader("SAMPLE DATA");
 
         ImGui::SetCursorPos(ImVec2(0.0f, kHeaderHeight + 6.0f));
 
@@ -343,7 +338,7 @@ void ScienceView::RenderRightColumn(const State& state, float width) const
         ImGui::TextColored(kTitleText, "SENSORS & KINEMATICS");
         ImGui::Dummy(ImVec2(0.0f, 8.0f));
 
-        RenderGpsCard(state.gps);
+        renderGpsCard(state.gps);
 
         ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
@@ -405,12 +400,12 @@ bool ScienceView::RenderSlotButton(const char* id, const char* label, bool is_fi
     return clicked;
 }
 
-void ScienceView::RenderArmTelemetryCard(const ArmTelemetry& arm,
-                                         const GripperTelemetry& gripper) const
+void ScienceView::RenderArmTelemetryCard(const armTelemetry_S& arm,
+                                         const gripperTelemetry_S& gripper) const
 {
-    if (BeginCard("ArmCard", ImVec2(0.0f, 0.0f)))
+    if (beginCard("ArmCard", ImVec2(0.0f, 0.0f)))
     {
-        DrawHeader("ARM TELEMETRY");
+        drawHeader("ARM TELEMETRY");
 
         struct FloatRow
         {
@@ -430,10 +425,10 @@ void ScienceView::RenderArmTelemetryCard(const ArmTelemetry& arm,
 
         for (const FloatRow& row : joints)
         {
-            ValueRow(kLabelX, kValueX, kBlue, row.label, "%.0f°", row.value);
+            valueRow(kLabelX, kValueX, kBlue, row.label, "%.0f°", row.value);
         }
 
-        View::InnerSeparator();
+        View::innerSeparator();
 
         const FloatRow position[] = {{"X:", arm.ee_x_m}, {"Y:", arm.ee_y_m}, {"Z:", arm.ee_z_m}};
 
@@ -443,21 +438,21 @@ void ScienceView::RenderArmTelemetryCard(const ArmTelemetry& arm,
 
         for (const FloatRow& row : position)
         {
-            ValueRow(kLabelX, kValueX, kPurple, row.label, "%.2f m", row.value);
+            valueRow(kLabelX, kValueX, kPurple, row.label, "%.2f m", row.value);
         }
 
-        View::InnerSeparator();
+        View::innerSeparator();
 
         ImGui::SetCursorPosX(kCardPadX);
         ImGui::TextColored(kMutedText, "GRIPPER STATE");
         ImGui::Dummy(ImVec2(0.0f, 4.0f));
 
-        ValueRow(kLabelX, kValueX, kGreen, "STATE:", "%s", ToString(gripper.state));
+        valueRow(kLabelX, kValueX, kGreen, "STATE:", "%s", ToString(gripper.state));
 
-        ValueRow(kLabelX, kValueX, kOrange, "FORCE:", "%.0f N", gripper.force_n);
+        valueRow(kLabelX, kValueX, kOrange, "FORCE:", "%.0f N", gripper.force_n);
     }
 
-    EndCard();
+    endCard();
 }
 
 const char* ScienceView::ToString(DrillState state) noexcept
@@ -477,20 +472,20 @@ const char* ScienceView::ToString(DrillState state) noexcept
     return "UNKNOWN";
 }
 
-const char* ScienceView::ToString(GripperState state) noexcept
+const char* ScienceView::ToString(gripperState_E state) noexcept
 {
     switch (state)
     {
-    case GripperState::Open:
+    case gripperState_E::Open:
         return "OPEN";
 
-    case GripperState::Closed:
+    case gripperState_E::Closed:
         return "CLOSED";
 
-    case GripperState::Holding:
+    case gripperState_E::Holding:
         return "HOLDING";
 
-    case GripperState::Error:
+    case gripperState_E::Error:
         return "ERROR";
     }
 

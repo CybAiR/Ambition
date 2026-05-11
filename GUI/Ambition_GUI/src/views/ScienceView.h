@@ -3,11 +3,13 @@
 #include "View.h"
 #include <array>
 
-class ScienceView : public View {
-public:
+class ScienceView : public View
+{
+  public:
     ScienceView(ImGuiWindowFlags flags = 0);
 
-    enum class Action {
+    enum class Action
+    {
         None,
         DrillStart,
         DrillStop,
@@ -17,41 +19,45 @@ public:
         Slot4
     };
 
-    enum class DrillState {
+    enum class DrillState
+    {
         Idle,
         Running,
         Error
     };
 
-    struct DrillTelemetry {
+    struct DrillTelemetry
+    {
         DrillState state = DrillState::Idle;
         float depth_cm = 12.0f;
     };
 
-    struct State {
-        GpsOdometry gps;
-        ArmTelemetry arm;
+    struct State
+    {
+        gpsOdometry_S gps;
+        armTelemetry_S arm;
         DrillTelemetry drill;
-        GripperTelemetry gripper;
+        gripperTelemetry_S gripper;
 
-        std::array<bool, 4> container_filled = {
-            false,
-            false,
-            false,
-            false
-        };
+        std::array<bool, 4> container_filled = {false, false, false, false};
 
         float scale_weight_g = 142.5f;
     };
 
-public:
+  public:
     Action Render();
     Action Render(const State& state);
 
-    State& Data() noexcept { return state_; }
-    const State& Data() const noexcept { return state_; }
+    State& Data() noexcept
+    {
+        return state_;
+    }
+    const State& Data() const noexcept
+    {
+        return state_;
+    }
 
-private:
+  private:
     Action RenderLeftColumn(const State& state, float width);
     Action RenderBottomPanel(const State& state) const;
 
@@ -61,19 +67,17 @@ private:
 
     void RenderRightColumn(const State& state, float width) const;
 
-    void RenderArmTelemetryCard(
-        const ArmTelemetry& arm,
-        const GripperTelemetry& gripper
-    ) const;
+    void RenderArmTelemetryCard(const armTelemetry_S& arm, const gripperTelemetry_S& gripper) const;
 
-    bool RenderSlotButton(const char* id, const char* label, bool is_filled, float cell_width) const;
+    bool RenderSlotButton(const char* id, const char* label, bool is_filled,
+                          float cell_width) const;
 
     static const char* ToString(DrillState state) noexcept;
-    static const char* ToString(GripperState state) noexcept;
+    static const char* ToString(gripperState_E state) noexcept;
 
-    void InnerSeparator() const; 
+    void InnerSeparator() const;
 
-private:
+  private:
     State state_;
     bool is_camera_fullscreen_ = false;
 };
