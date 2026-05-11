@@ -59,45 +59,58 @@ void ProbingView::render()
     ImGui::PushID(this);
 
     const ImVec2 avail = ImGui::GetContentRegionAvail();
-    const float gap_x = ImGui::GetStyle().ItemSpacing.x;
 
-    float right_width = K_RIGHT_PANEL_WIDTH;
-
-    if (avail.x < K_MIN_LEFT_WIDTH + right_width + gap_x)
+    if (is_camera_fullscreen_)
     {
-        right_width = avail.x - K_MIN_LEFT_WIDTH - gap_x;
+        renderLeftColumn(avail.x);
     }
-
-    right_width = std::clamp(right_width, K_MIN_RIGHT_WIDTH, K_RIGHT_PANEL_WIDTH);
-
-    if (avail.x < K_MIN_LEFT_WIDTH + K_MIN_RIGHT_WIDTH + gap_x)
+    else
     {
-        right_width = std::max(avail.x * 0.35f, 1.0f);
+        const float gap_x = ImGui::GetStyle().ItemSpacing.x;
+
+        float right_width = K_RIGHT_PANEL_WIDTH;
+
+        if (avail.x < K_MIN_LEFT_WIDTH + right_width + gap_x)
+            right_width = avail.x - K_MIN_LEFT_WIDTH - gap_x;
+
+        right_width = std::clamp(right_width, K_MIN_RIGHT_WIDTH, K_RIGHT_PANEL_WIDTH);
+
+        if (avail.x < K_MIN_LEFT_WIDTH + K_MIN_RIGHT_WIDTH + gap_x)
+            right_width = std::max(avail.x * 0.35f, 1.0f);
+
+        float left_width = std::max(avail.x - right_width - gap_x, 1.0f);
+
+        renderLeftColumn(left_width);
+
+        ImGui::SameLine(0.0f, gap_x);
+        renderRightColumn(right_width);
     }
-
-    float left_width = avail.x - right_width - gap_x;
-    left_width = std::max(left_width, 1.0f);
-
-    renderLeftColumn(left_width);
-
-    ImGui::SameLine(0.0f, gap_x);
-
-    renderRightColumn(right_width);
 
     ImGui::PopID();
 }
 
-void ProbingView::renderLeftColumn(float width) const
+void ProbingView::renderLeftColumn(float width)
 {
     if (ImGui::BeginChild("LeftColumn", ImVec2(width, 0.0f), false, kNoScrollFlags))
     {
         const float gap_y = ImGui::GetStyle().ItemSpacing.y;
         const ImVec2 avail = ImGui::GetContentRegionAvail();
 
+        const bool was_fullscreen = is_camera_fullscreen_;
         float camera_height = avail.y;
         camera_height = std::max(camera_height, 1.0f);
 
-        View::RenderCameraContainer(camera_height);
+        const bool is_fullscreen_toggled = RenderCameraContainer(
+            camera_height, "MAIN CAMERA (PROBING)", false, true, was_fullscreen);
+
+        if (is_fullscreen_toggled)
+        {
+            is_camera_fullscreen_ = !is_camera_fullscreen_;
+        }
+
+        if (!was_fullscreen && !is_fullscreen_toggled)
+        {
+        }
     }
 
     ImGui::EndChild();

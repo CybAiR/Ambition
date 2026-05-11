@@ -30,7 +30,7 @@ class MaintenanceView : public View
     void render();
 
   private:
-    void renderLeftColumn(float width) const;
+    void renderLeftColumn(float width);
     void renderRightColumn(float width) const;
     void renderArmTelemetryCard(const ArmTelemetry& arm, const GripperTelemetry& gripper) const;
     void renderJointDiagnostics(const jointDiagnostics_S& joints) const;
@@ -39,4 +39,5 @@ class MaintenanceView : public View
     static const char* toString(GripperState state);
 
     state_S state_;
+    bool is_camera_fullscreen_ = false;
 };
