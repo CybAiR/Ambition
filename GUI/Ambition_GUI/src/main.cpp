@@ -7,6 +7,7 @@
 #include <SDL2/SDL_opengl.h>
 
 #include "fonts/IconsFontAwesome6.h"
+#include "views/MaintenanceView.h"
 #include "views/NavigationView.h"
 #include "views/ScienceView.h"
 
@@ -55,6 +56,8 @@ int main(int argc, char* argv[])
     ScienceView science_view;
     // ScienceView science_view;
     NavigationView navigation_view;
+    // ScienceView science_view;
+    MaintenanceView maintenance_view;
 
     bool done = false;
     while (!done)
@@ -110,7 +113,7 @@ int main(int argc, char* argv[])
             navigation_view.render();
             break;
         case Views::Maintenance:
-            ImGui::Text("Widok Maintenance (w budowie)");
+            maintenance_view.render();
             break;
         case Views::Probing:
             ImGui::Text("Widok Probing (w budowie)");
