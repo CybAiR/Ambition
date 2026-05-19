@@ -253,7 +253,7 @@ class MotorControlNode : public rclcpp::Node
     rclcpp::TimerBase::SharedPtr pWatchdog_timer_ = nullptr;
     rclcpp::Clock::SharedPtr     pClock_          = nullptr;
     rclcpp::Time                 last_cmd_vel_time_{0};
-    rclcpp::Duration             watchdog_timeout_{0, 500000};
+    rclcpp::Duration             watchdog_timeout_{0, 500000000};
 
     double kv_           = 1.0;
     double kw_           = 1.0;
@@ -288,10 +288,15 @@ class MotorControlNode : public rclcpp::Node
     void watchdogCallback()
     {
         if ((pClock_->now() - last_cmd_vel_time_) < watchdog_timeout_)
+
             return;
 
-        RCLCPP_WARN_THROTTLE(
-            this->get_logger(), *pClock_, 1000, "Watchdog triggered: No cmd_vel received.");
+        RCLCPP_WARN_THROTTLE(this->get_logger(),
+                             *pClock_,
+                             1000,
+                             "Watchdog triggered: No cmd_vel received. Elapsed: %f, timeout %f",
+                             (pClock_->now() - last_cmd_vel_time_).seconds(),
+                             watchdog_timeout_.seconds());
 
         // stop motors
         auto pub_msg            = candle_ros2::msg::MotionCmd();
