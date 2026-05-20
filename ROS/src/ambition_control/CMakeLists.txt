@@ -11,11 +11,11 @@ find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(candle_ros2 REQUIRED)
 
-add_executable(motor_control src/motor_control.cpp)
-ament_target_dependencies(motor_control rclcpp geometry_msgs candle_ros2)
+add_executable(motor_control_node src/motor_control_node.cpp)
+ament_target_dependencies(motor_control_node rclcpp geometry_msgs candle_ros2)
 
 install(TARGETS
-  motor_control
+  motor_control_node
   DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)

@@ -18,8 +18,8 @@ def generate_launch_description():
     
     motor_node = Node(
         package='ambition_control',
-        executable='motor_control',
-        name='motor_control',
+        executable='motor_control_node',
+        name='motor_control_node',
         parameters=[os.path.join(
             get_package_share_directory('ambition_commons'),
             'config',
