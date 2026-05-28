@@ -3,10 +3,10 @@ import cv2
 from ultralytics import YOLO
 
 if __name__ == '__main__':
-    model = YOLO('yolo26n.pt')
+    model = YOLO('yolov8n.pt')
 
     model.train(
-        data='data.yaml',
+        data=r'D:\Studia\cybAIR\Ambition\rocks_detection\Detection\img2\data.yaml',
         epochs=50,
         imgsz=640,
         batch=4,
@@ -26,7 +26,7 @@ if __name__ == '__main__':
             for box in results[0].boxes:
                 x1, y1, x2, y2 = map(int, box.xyxy[0])
                 cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2, cv2.LINE_AA)
-            cv2.imshow("YOLO26 Detekcja", img)
+            cv2.imshow("YOLO Detekcja", img)
             cv2.waitKey(0)
             break
 
