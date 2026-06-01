@@ -32,8 +32,12 @@ qDepth = stereo.depth.createOutputQueue(maxSize=4, blocking=False)
 
 pipeline.start()
 
-fx = 287.0
-fy = 287.0
+device = pipeline.getDefaultDevice()
+
+calibData = device.readCalibration()
+intrinsics = calibData.getCameraIntrinsics(dai.CameraBoardSocket.CAM_A, 416, 416)
+fx = intrinsics[0][0]
+fy = intrinsics[1][1]
 
 while pipeline.isRunning():
     inRgb = qRgb.get()
