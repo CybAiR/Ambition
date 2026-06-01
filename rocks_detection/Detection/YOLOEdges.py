@@ -4,7 +4,11 @@ import numpy as np
 from ultralytics import YOLO
 
 if __name__ == "__main__":
+<<<<<<< Updated upstream
     model_path = r"D:\Studia\cybAIR\Ambition\rocks_detection\Detection\runs\detect\depthai_model\yolo_rocks-5\weights\best.pt"
+=======
+    model_path = r"runs\detect\depthai_model\yolo_rocks-9\weights\best.pt"
+>>>>>>> Stashed changes
     model = YOLO(model_path)
 
     pipeline = dai.Pipeline()
