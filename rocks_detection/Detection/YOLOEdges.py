@@ -4,11 +4,9 @@ import numpy as np
 from ultralytics import YOLO
 
 if __name__ == "__main__":
-<<<<<<< Updated upstream
+
     model_path = r"D:\Studia\cybAIR\Ambition\rocks_detection\Detection\runs\detect\depthai_model\yolo_rocks-5\weights\best.pt"
-=======
-    model_path = r"runs\detect\depthai_model\yolo_rocks-9\weights\best.pt"
->>>>>>> Stashed changes
+
     model = YOLO(model_path)
 
     pipeline = dai.Pipeline()
@@ -33,13 +31,16 @@ if __name__ == "__main__":
 
     depthQueue = stereo.depth.createOutputQueue()
 
-    fx = 1300.0
-    fy = 1300.0
-
     with pipeline:
         pipeline.start()
+        device = pipeline.getDefaultDevice()
 
-        print("YOLO26 i stereowizja gotowe. Nacisnij 'q' aby wyjsc.")
+        calibData = device.readCalibration()
+        intrinsics = calibData.getCameraIntrinsics(dai.CameraBoardSocket.CAM_A, 1920, 1080)
+        fx = intrinsics[0][0]
+        fy = intrinsics[1][1]
+
+        print("YOLOv8 i stereowizja gotowe. Nacisnij 'q' aby wyjsc.")
 
         while pipeline.isRunning():
             videoIn = videoQueue.get()
@@ -75,7 +76,7 @@ if __name__ == "__main__":
                     text = f"W:{width_cm:.1f}cm H:{height_cm:.1f}cm Z:{z_cm:.1f}cm"
                     cv2.putText(annotated_frame, text, (x1, y2 + 25), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
-            cv2.imshow("YOLO26 - Detekcja Kamieni", annotated_frame)
+            cv2.imshow("YOLOv8 - Detekcja Kamieni", annotated_frame)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 pipeline.stop()

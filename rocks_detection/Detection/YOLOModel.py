@@ -6,7 +6,7 @@ if __name__ == '__main__':
     model = YOLO('yolov8n.pt')
 
     model.train(
-        data=r'D:\Studia\cybAIR\Ambition\rocks_detection\Detection\img2\data.yaml',
+        data=r'D:\Studia\cybAIR\Ambition\rocks_detection\Detection\data.yaml',
         epochs=50,
         imgsz=640,
         batch=4,

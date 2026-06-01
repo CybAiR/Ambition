@@ -7,7 +7,7 @@ names: ['Rock']
 
 roboflow:
   workspace: kamien
-  project: martian-rocks-v1
-  version: 1
-  license: CC BY 4.0
-  url: https://universe.roboflow.com/kamien/martian-rocks-v1/dataset/1
+  project: kamien
+  version: dataset
+  license: Private
+  url: https://app.roboflow.com/kamien/kamien/dataset

@@ -2,3 +2,6 @@ rock_detection/Detection/img/
 rock_detection/Detection/img2/
 /rocks_detection/Detection/img
 /rocks_detection/Detection/img2
+/rocks_detection/Detection/test
+/rocks_detection/Detection/train
+/rocks_detection/Detection/valid
