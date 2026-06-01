@@ -8,7 +8,7 @@ cam = pipeline.create(dai.node.Camera).build()
 cam_out = cam.requestOutput((416, 416), type=dai.ImgFrame.Type.BGR888p)
 
 nn = pipeline.create(dai.node.NeuralNetwork)
-nn.setBlobPath("depthai_model/best1_openvino_2022.1_6shave.blob")
+nn.setBlobPath("depthai_model/best_openvino_2022.1_6shave.blob")
 
 cam_out.link(nn.input)
 
@@ -24,7 +24,7 @@ while pipeline.isRunning():
     frame = inRgb.getCvFrame()
 
     if inDet.getAllLayerNames():
-        out_tensor = inDet.getFirstTensor().reshape(10, 3549)
+        out_tensor = inDet.getFirstTensor().reshape(5, 3549)
         predictions = out_tensor.T
 
         boxes = []

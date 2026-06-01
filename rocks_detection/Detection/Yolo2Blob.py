@@ -2,7 +2,7 @@ import os
 from ultralytics import YOLO
 import blobconverter
 
-model = YOLO(r"D:\Studia\cybAIR\Ambition\rocks_detection\Detection\runs\detect\depthai_model\yolo_rocks-9\weights\best.pt")
+model = YOLO(r"D:\Studia\cybAIR\Ambition\rocks_detection\Detection\runs\detect\depthai_model\yolo_rocks-5\weights\best.pt")
 
 onnx_model_path = model.export(format="onnx", imgsz=416, opset=11, nms=False)
 print(f"Model wyeksportowany do ONNX: {onnx_model_path}")
