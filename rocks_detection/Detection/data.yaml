@@ -1,6 +1,8 @@
-train: ../train/images
-val: ../valid/images
-test: ../test/images
+train:
+  - D:/Studia/cybAIR/Ambition/rocks_detection/Detection/train/images
+  - D:/Studia/cybAIR/Ambition/rocks_detection/Detection/trainNoise/images
+val: D:/Studia/cybAIR/Ambition/rocks_detection/Detection/valid/images
+test: D:/Studia/cybAIR/Ambition/rocks_detection/Detection/test/images
 
 nc: 1
 names: ['Rock']

@@ -1,5 +1,3 @@
-rock_detection/Detection/img/
-rock_detection/Detection/img2/
 /rocks_detection/Detection/img/
 /rocks_detection/Detection/img2/
 /rocks_detection/Detection/test/
@@ -8,4 +6,5 @@ rock_detection/Detection/img2/
 /rocks_detection/Detection/lunar_Base/
 /rocks_detection/Detection/notTested/
 /rocks_detection/Detection/poor_martian_Base/
+/rocks_detection/Detection/trianNoise/
 /rocks_detection/Detection/video/
