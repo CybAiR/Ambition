@@ -5,7 +5,7 @@ from ultralytics import YOLO
 
 if __name__ == "__main__":
 
-    model_path = r"D:\Studia\cybAIR\Ambition\rocks_detection\Detection\runs\detect\depthai_model\yolo_rocks\weights\best.pt"
+    model_path = r"D:\Studia\cybAIR\Ambition\rocks_detection\Detection\runs\detect\depthai_model\yolo_rocks_btr_opensource\weights\best.pt"
 
     model = YOLO(model_path)
 
