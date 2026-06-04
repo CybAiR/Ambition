@@ -3,6 +3,7 @@ from rclpy.node import Node
 
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
+from sensor_msgs.msg import CameraInfo
 from cv_bridge import CvBridge
 import numpy as np
 
@@ -14,6 +15,14 @@ from ros_object_detection_msgs.msg import BoundingBox, BoundingBoxes
 #matplotlib.use('Agg')
 #import matplotlib.pyplot as plt
 # 
+from dataclasses import dataclass
+
+
+@dataclass
+class Point:
+    x: float
+    y: float
+    z: float
 
 class MinimalSubscriber(Node):
 
@@ -26,6 +35,10 @@ class MinimalSubscriber(Node):
         self.boxes = None
         self.image_height = 400
         self.image_width = 640
+        self.focal_lengthX = None
+        self.focal_lengthY = None
+        self.cx = None
+        self.cy = None
 
         self.subscription = self.create_subscription(
             BoundingBoxes,
@@ -38,6 +51,12 @@ class MinimalSubscriber(Node):
             self.depth_callback,
             10
         )
+        self.info_sub = self.create_subscription(
+            CameraInfo,
+            'oak/stereo/camera_info',
+            self.camera_info_callback,
+            10
+        )
         self.pub = self.create_publisher(
             String,
             'rocks',
@@ -45,7 +64,15 @@ class MinimalSubscriber(Node):
         )
         self.subscription  # prevent unused variable warning
         self.sub_depth
-
+    def camera_info_callback(self,msg):
+        if self.focal_lengthX is None:
+            self.get_logger().warning(f'Camera info: {msg.k}')
+            self.focal_lengthX = msg.k[0]
+            self.focal_lengthY = msg.k[4]
+            self.cx = msg.k[2]
+            self.cy = msg.k[5]
+        else:
+            pass
     def listener_callback(self, msg):
         self.get_logger().info('I heard: "%s"' % msg.data)
     def depth_callback(self, msg):
@@ -73,22 +100,31 @@ class MinimalSubscriber(Node):
             self.get_logger().info(f'W ROI jest {points.size} punktów, minimalna wartość: {points.min()}, maksymalna wartość: {points.max()}')
             
             # Wieving histogram of points in ROI:
-
             #points_to_plot = points.flatten()
             #plt.hist(points_to_plot,bins='auto')
             #plt.title("Points in ROI")
             #plt.savefig('histogram_odleglosci.png')
             #plt.clf()
             #self.get_logger().info('Zapisano wykres do pliku: histogram_odleglosci.png')
-
             ###
 
             # Calculating Median from points in ROI
             z = np.median(points)
             self.get_logger().info(f'odległość Z: {z} w punkcie: {center}')
-        msg = String()
-        #msg.data = f'Wymiar obrazka: {self.image.shape}'
-        #self.pub.publish(msg)
+
+            # Calculating X,Y,Z coordinates
+            u = center[0]*self.image_width
+            v = center[1]*self.image_height
+            cords = Point
+            cords.x = -(u-self.cy)*z/self.focal_lengthX
+            cords.y = (v-self.cx)*z/self.focal_lengthY
+            cords.z = float(z)
+
+            # Publishing results:
+            msg = String()
+            size = None
+            msg.data = f'Kamień o wielkości: {size} znajduje się na X: {cords.x} Y: {cords.y} Z: {cords.z} '
+            self.pub.publish(msg)
 
 def main(args=None):
     rclpy.init(args=args)
