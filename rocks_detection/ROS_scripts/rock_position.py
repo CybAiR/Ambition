@@ -113,17 +113,25 @@ class MinimalSubscriber(Node):
             self.get_logger().info(f'odległość Z: {z} w punkcie: {center}')
 
             # Calculating X,Y,Z coordinates
-            u = center[0]*self.image_width
-            v = center[1]*self.image_height
+            u = center[1]*self.image_width
+            v = center[0]*self.image_height
+            self.get_logger().info(f'parametr v: {v}')
             cords = Point
             cords.x = -(u-self.cy)*z/self.focal_lengthX
             cords.y = (v-self.cx)*z/self.focal_lengthY
             cords.z = float(z)
 
+            # Calculating rock size
+            du = xmax_pix - xmin_pix
+            dv = ymax_pix - ymin_pix
+            dx = (du * z)/self.focal_lengthX
+            dy = (dv * z)/self.focal_lengthY
+
+
             # Publishing results:
             msg = String()
-            size = None
-            msg.data = f'Kamień o wielkości: {size} znajduje się na X: {cords.x} Y: {cords.y} Z: {cords.z} '
+            size = [dx,dy]
+            msg.data = f'Kamień o wielkości: {size}mm znajduje się na X: {cords.x}mm Y: {cords.y}mm Z: {cords.z}mm '
             self.pub.publish(msg)
 
 def main(args=None):
