@@ -87,7 +87,7 @@ class MinimalSubscriber(Node):
             point1 = np.array([box.xmin, box.ymin])
             point2 = np.array([box.xmax, box.ymax])
             center = (point1 + point2)/2
-            self.get_logger().info(f'point1: {point1} point2: {point2}')
+            #self.get_logger().info(f'point1: {point1} point2: {point2}')
             # Extacting points and applaing Median filter
             xmin_pix = int(box.xmin*self.image_width)
             xmax_pix = int(box.xmax*self.image_width)
@@ -95,9 +95,12 @@ class MinimalSubscriber(Node):
             ymax_pix = int(box.ymax*self.image_height)
             points = self.image[ymin_pix:ymax_pix, xmin_pix:xmax_pix]
             # filtering 0 values from depth image
-            self.get_logger().info(f'W ROI jest {points.size} punktów, przed odżuceniem 0')
+            #self.get_logger().info(f'W ROI jest {points.size} punktów, przed odżuceniem 0')
             points = points[points != 0]
-            self.get_logger().info(f'W ROI jest {points.size} punktów, minimalna wartość: {points.min()}, maksymalna wartość: {points.max()}')
+            if points.size == 0:
+                self.get_logger().warning('Brak poprawnych danych głębi (same zera) dla tego kamienia. Pomijam.')
+                continue 
+            #self.get_logger().info(f'W ROI jest {points.size} punktów, minimalna wartość: {points.min()}, maksymalna wartość: {points.max()}')
             
             # Wieving histogram of points in ROI:
             #points_to_plot = points.flatten()
@@ -110,28 +113,29 @@ class MinimalSubscriber(Node):
 
             # Calculating Median from points in ROI
             z = np.median(points)
-            self.get_logger().info(f'odległość Z: {z} w punkcie: {center}')
+            #self.get_logger().info(f'odległość Z: {z} w punkcie: {center}')
 
             # Calculating X,Y,Z coordinates
-            u = center[1]*self.image_width
-            v = center[0]*self.image_height
-            self.get_logger().info(f'parametr v: {v}')
+            u = center[0]*self.image_width
+            v = center[1]*self.image_height
+            
             cords = Point
-            cords.x = -(u-self.cy)*z/self.focal_lengthX
-            cords.y = (v-self.cx)*z/self.focal_lengthY
+            cords.x = ((u-self.cy)*z)/self.focal_lengthX
+            cords.y = ((v-self.cx)*z)/self.focal_lengthY
             cords.z = float(z)
+            #self.get_logger().info(f'parametr cy: {self.cy} parametr cx: {self.cx}')
 
             # Calculating rock size
             du = xmax_pix - xmin_pix
             dv = ymax_pix - ymin_pix
-            dx = (du * z)/self.focal_lengthX
+            dx = (du * z)/self.focal_lengthX 
             dy = (dv * z)/self.focal_lengthY
 
 
             # Publishing results:
             msg = String()
             size = [dx,dy]
-            msg.data = f'Kamień o wielkości: {size}mm znajduje się na X: {cords.x}mm Y: {cords.y}mm Z: {cords.z}mm '
+            msg.data = f'Kamień o wielkości: [{(size[0]*0.1):.2f}, {(size[1]*0.1):.2f}]cm znajduje się na X: {(cords.x*0.001):.2f}m Y: {(cords.y*0.001):.2f}m Z: {(cords.z*0.001):.2f}m '
             self.pub.publish(msg)
 
 def main(args=None):
