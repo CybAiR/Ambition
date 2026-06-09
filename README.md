@@ -6,7 +6,7 @@ Please read the cybair_pedia repo before you begin your work guyz
 ```
 mkdir SKAMIELINY
 cd SKAMIELINY
-git clone
+git clone (make sure there is only scr file with all files inside in SKAMIELINY folder)
 cd src (check that all files are downloaded good)
 cd ..
 colcon build
