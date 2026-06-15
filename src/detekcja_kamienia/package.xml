@@ -4,7 +4,7 @@
   <name>detekcja_kamienia</name>
   <version>0.0.0</version>
   <description>Detekcja kamieni za pomocą OAK-D i YOLO</description>
-  <maintainer email="kprzekora21@gmail.com">linuxenjoyer</maintainer>
+  <maintainer email="@gmail.com">linuxenjoyer</maintainer>
   <license>Apache-2.0</license>
   
   <depend>rclpy</depend>
