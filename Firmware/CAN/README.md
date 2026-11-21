@@ -9,10 +9,19 @@ Copy into your project:
 - Drivers/CAN/Inc/can_manager.h
 - Drivers/CAN/Src/can_manager.c
 
+---
+
+### 2. Configure STM32 HAL version
+Open can.manager.h and check the HAL include:
+```
+#include "stm32l4xx_hal.h"
+```
+Change ```stm32l4xx_hal.h``` to match your STM32 family if necessary
+
 
 ---
 
-### 2. Include path
+### 3. Include path
 
 #### STM32CubeIDE (CubeMX project)
 Add include directory:
@@ -38,7 +47,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
 
 ---
 
-### 3. Include CAN manager
+### 4. Include CAN manager
 Add to ```main.c```  
 in ```/* Includes */```:
 ```
@@ -47,7 +56,7 @@ in ```/* Includes */```:
 
 ---
 
-### 4. Initialize CAN
+### 5. Initialize CAN
 Add to ```main.c```  
 in ```/* USER CODE BEGIN 2 */```:
 ```
@@ -57,7 +66,7 @@ CAN_Manager_Init(&hcan1, CAN1_RX0_IRQn);
 
 ---
 
-### 5. Enable RX callback
+### 6. Enable RX callback
 Add to ```main.c```
 in ```/* USER CODE BEGIN 4 */```:
 ```
@@ -96,6 +105,25 @@ if (CAN_Manager_Read(&msg))
 ```
 CAN_Manager_SetFilter(0x100, 0x7FF); // exact match
 ```
+
+---
+### Physical connection
+CAN communication requires a CAN transciever (e.g. SN65HVD230). The STM32 CAN uses logic-level signals and must NOT be connected directly to the CAN bus
+
+Connect as follows:
+
+| STM32 | Transceiver |
+|---|---|
+| STM32 CAN_TX | Transceiver TXD  |
+| STM32 CAN_RX | Transceiver RXD  |
+| STM32 3.3V   | Transceiver 3.3V |
+
+| STM32/Transceiver | Shared |
+|---|---|
+| Transceiver CANH  | CANH   |
+| Transceiver CANL  | CANL   |
+| Tarnsceiver GND   | GND    |
+| STM32 GND         | GND    |
 
 ---
 
