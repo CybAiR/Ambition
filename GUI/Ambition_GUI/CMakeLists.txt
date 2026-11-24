@@ -41,3 +41,15 @@ target_include_directories(rover_ui PRIVATE
 
 # Link SDL2 and OpenGL
 target_link_libraries(rover_ui PRIVATE ${SDL2_LIBRARIES} OpenGL::GL)
+
+set(ROVER_UI_FONTS
+    "${CMAKE_CURRENT_SOURCE_DIR}/misc/fonts/Roboto-Medium.ttf"
+    "${CMAKE_CURRENT_SOURCE_DIR}/misc/fonts/fa-solid-900.otf"
+)
+set_property(TARGET rover_ui APPEND PROPERTY LINK_DEPENDS "${ROVER_UI_FONTS}")
+add_custom_command(TARGET rover_ui POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:rover_ui>/fonts"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${ROVER_UI_FONTS} "$<TARGET_FILE_DIR:rover_ui>/fonts"
+    VERBATIM
+)

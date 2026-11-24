@@ -5,6 +5,9 @@
 #include "panels/TopPanel.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
+#include <cstdio>
+#include <fstream>
+#include <string>
 
 #include "fonts/IconsFontAwesome6.h"
 #include "views/MaintenanceView.h"
@@ -14,23 +17,42 @@
 
 int main(int argc, char* argv[])
 {
+    char* base_path = SDL_GetBasePath();
+    if (!base_path)
+    {
+        std::fprintf(stderr, "Could not locate the GUI executable directory: %s\n", SDL_GetError());
+        return 1;
+    }
+    const std::string font_directory = std::string(base_path) + "fonts/";
+    SDL_free(base_path);
+
+    const std::string roboto_path = font_directory + "Roboto-Medium.ttf";
+    const std::string icon_path = font_directory + "fa-solid-900.otf";
+    for (const std::string* font_path : {&roboto_path, &icon_path})
+    {
+        if (!std::ifstream(*font_path, std::ios::binary))
+        {
+            std::fprintf(stderr, "Could not read required GUI font: %s\n", font_path->c_str());
+            return 1;
+        }
+    }
+
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
     ImGuiIO& io = ImGui::GetIO();
 
-    ImFont* main_font = io.Fonts->AddFontFromFileTTF("../misc/fonts/Roboto-Medium.ttf", 15.0f);
+    io.Fonts->AddFontFromFileTTF(roboto_path.c_str(), 15.0f);
 
     ImFontConfig icon_config;
     icon_config.MergeMode = true;
     icon_config.PixelSnapH = true;
     icon_config.GlyphOffset = ImVec2(-3.0f, 1.0f);
     static const ImWchar sIcon_ranges[] = {ICON_MIN_FA, ICON_MAX_FA, 0};
-    io.Fonts->AddFontFromFileTTF("../misc/fonts/fa-solid-900.otf", 15.0f, &icon_config,
-                                 sIcon_ranges);
+    io.Fonts->AddFontFromFileTTF(icon_path.c_str(), 15.0f, &icon_config, sIcon_ranges);
 
-    ImFont* bold_font = io.Fonts->AddFontFromFileTTF("../misc/fonts/Roboto-Medium.ttf", 15.0f);
-    ImFont* logo_font = io.Fonts->AddFontFromFileTTF("../misc/fonts/Roboto-Medium.ttf", 32.0f);
+    io.Fonts->AddFontFromFileTTF(roboto_path.c_str(), 15.0f);
+    io.Fonts->AddFontFromFileTTF(roboto_path.c_str(), 32.0f);
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
