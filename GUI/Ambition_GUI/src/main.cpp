@@ -1,0 +1,185 @@
+#include "imgui.h"
+#include "imgui_impl_opengl3.h"
+#include "imgui_impl_sdl2.h"
+#include "panels/SidePanel.h"
+#include "panels/TopPanel.h"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_opengl.h>
+#include <cstdio>
+#include <fstream>
+#include <string>
+
+#include "fonts/IconsFontAwesome6.h"
+#include "views/MaintenanceView.h"
+#include "views/NavigationView.h"
+#include "views/ProbingView.h"
+#include "views/ScienceView.h"
+
+int main(int argc, char* argv[])
+{
+    char* base_path = SDL_GetBasePath();
+    if (!base_path)
+    {
+        std::fprintf(stderr, "Could not locate the GUI executable directory: %s\n", SDL_GetError());
+        return 1;
+    }
+    const std::string font_directory = std::string(base_path) + "fonts/";
+    SDL_free(base_path);
+
+    const std::string roboto_path = font_directory + "Roboto-Medium.ttf";
+    const std::string icon_path = font_directory + "fa-solid-900.otf";
+    for (const std::string* font_path : {&roboto_path, &icon_path})
+    {
+        if (!std::ifstream(*font_path, std::ios::binary))
+        {
+            std::fprintf(stderr, "Could not read required GUI font: %s\n", font_path->c_str());
+            return 1;
+        }
+    }
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+
+    ImGuiIO& io = ImGui::GetIO();
+
+    io.Fonts->AddFontFromFileTTF(roboto_path.c_str(), 15.0f);
+
+    ImFontConfig icon_config;
+    icon_config.MergeMode = true;
+    icon_config.PixelSnapH = true;
+    icon_config.GlyphOffset = ImVec2(-3.0f, 1.0f);
+    static const ImWchar sIcon_ranges[] = {ICON_MIN_FA, ICON_MAX_FA, 0};
+    io.Fonts->AddFontFromFileTTF(icon_path.c_str(), 15.0f, &icon_config, sIcon_ranges);
+
+    io.Fonts->AddFontFromFileTTF(roboto_path.c_str(), 15.0f);
+    io.Fonts->AddFontFromFileTTF(roboto_path.c_str(), 32.0f);
+
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+
+    ImGui::StyleColorsDark();
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.Colors[ImGuiCol_Text] = ImVec4(0.80f, 0.80f, 0.80f, 1.00f);
+    style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.40f, 0.40f, 0.40f, 1.00f);
+
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
+    SDL_Window* window =
+        SDL_CreateWindow("Ambition GUI", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720,
+                         SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+
+    SDL_GLContext gl_context = SDL_GL_CreateContext(window);
+    SDL_GL_MakeCurrent(window, gl_context);
+    SDL_GL_SetSwapInterval(1);
+
+    ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
+    ImGui_ImplOpenGL3_Init("#version 130");
+
+    Views active_view = Views::Science;
+    ScienceView science_view;
+    NavigationView navigation_view;
+    MaintenanceView maintenance_view;
+    ProbingView probing_view;
+
+    TopPanel::mode_E current_mode = TopPanel::mode_E::DRIVE;
+
+    bool done = false;
+    while (!done)
+    {
+        SDL_Event event;
+        while (SDL_PollEvent(&event))
+        {
+            ImGui_ImplSDL2_ProcessEvent(&event);
+            if (event.type == SDL_QUIT)
+                done = true;
+        }
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
+        ImGui::NewFrame();
+
+        const ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+        ImGuiWindowFlags side_panel_flags = ImGuiWindowFlags_NoTitleBar |
+                                            ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+                                            ImGuiWindowFlags_NoCollapse;
+
+        ImGuiWindowFlags main_view_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+                                           ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
+                                           ImGuiWindowFlags_NoSavedSettings |
+                                           ImGuiWindowFlags_NoCollapse;
+
+        ImGuiWindowFlags top_panel_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+                                           ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse;
+
+        std::string view_name;
+        switch (active_view)
+        {
+        case Views::Science:
+            view_name = "Science";
+            break;
+
+        case Views::Navigation:
+            view_name = "Navigation";
+            break;
+
+        case Views::Maintenance:
+            view_name = "Maintenance";
+            break;
+
+        case Views::Probing:
+            view_name = "Probing";
+            break;
+        }
+        TopPanel top_panel(viewport->WorkSize.x, top_panel_flags);
+        top_panel.render(viewport, current_mode, view_name);
+
+        SidePanel side_panel(side_panel_flags);
+        side_panel.render(viewport, active_view);
+
+        ImVec2 main_view_pos(viewport->WorkPos.x + side_panel.getWidth(),
+                             viewport->WorkPos.y + 75.0f);
+        ImVec2 main_view_size(viewport->WorkSize.x - side_panel.getWidth(),
+                              viewport->WorkSize.y - 75.0f);
+
+        ImGui::SetNextWindowPos(main_view_pos);
+        ImGui::SetNextWindowSize(main_view_size);
+
+        ImGui::Begin("MainView", nullptr, main_view_flags);
+
+        switch (active_view)
+        {
+        case Views::Science:
+            science_view.render();
+            break;
+        case Views::Navigation:
+            navigation_view.render();
+            break;
+        case Views::Maintenance:
+            maintenance_view.render();
+            break;
+        case Views::Probing:
+            probing_view.render();
+            break;
+        }
+
+        ImGui::End();
+
+        ImGui::Render();
+        glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        SDL_GL_SwapWindow(window);
+    }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
+
+    SDL_GL_DeleteContext(gl_context);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+
+    return 0;
+}
